@@ -1,0 +1,12 @@
+Package: RODPS
+Version: 1.1
+Title: R interface to interact with ODPS
+Description: This package is developed for R to interact with ODPS,
+ which is the platform of Alibaba to process big data.
+Author: Weidong Yao
+Maintainer: Yichao Cheng <yichao.cheng@alibaba-inc.com>
+License: Apache License 2.0
+Depends: R (>= 1.8.0), rJava, DBI, RSQLite
+Imports: methods
+URL: http://gitlab.alibaba-inc.com/aliopensource/aliyun-odps-r-plugin
+Packaged: 2015-08-07 13:30:00 UTC; 

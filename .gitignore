@@ -1,0 +1,11 @@
+*.iml
+.idea
+target/
+.DS_Store
+*.jar
+*.tar.gz
+*.tgz
+*.log*
+RODPS.Rcheck/
+*.ini
+*~
