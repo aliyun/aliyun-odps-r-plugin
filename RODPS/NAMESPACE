@@ -1,8 +1,4 @@
 import("rJava")
-import("methods")
-import("DBI")
-import("RSQLite")
-import("utils")
 exportPattern("fatal")
 exportPattern("error")
 exportPattern("warn")
