@@ -1,6 +1,7 @@
 language: java
+jdk: openjdk6
 install: sh ./build.sh
-script: mvn package -DskipTests=true -Dgpg.skip=true -Djavadoc.skip=true
+script: sh ./build.sh
 before_deploy:
 - export RELEASE_JARS=$(ls RODPS*.tar.gz)
 - echo "deploying RELEASE_JARS to GitHub releases"
