@@ -1,5 +1,7 @@
 # RODPS: ODPS Plugin for R
 
+[![Build Status](https://travis-ci.org/aliyun/aliyun-odps-r-plugin.svg?branch=master)](https://travis-ci.org/aliyun/aliyun-odps-r-plugin)
+
 
 ## Features
 
