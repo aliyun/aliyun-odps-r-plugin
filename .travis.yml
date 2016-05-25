@@ -3,14 +3,14 @@ jdk: openjdk6
 install: sh ./build.sh
 script: sh ./build.sh
 before_deploy:
-- export RELEASE_JARS=$(ls RODPS*.tar.gz)
+- export RELEASE_JARS=$(ls ./RODPS*.tar.gz)
 - echo "deploying RELEASE_JARS to GitHub releases"
 deploy:
   provider: releases
   api_key:
-    secure: OKoCacW3NwbaOoL3ZNSkzgvWF2b4n+qwHxAqROjC6OvOilYPmLovxbGxWYYeGCOxOeS2k2sDkIA5X2kqn7Q5yXPtoYuIjCjq6HJBmcayOSrw6wIISsa+c5nw7tLswZjbq4A96SLgevWUEi0AD87H6buWB2EN9ro0uqmDDSMWeqX2ogbxWJKcNQKTLSOWoZFNlkChupLeZ2hce0Nc2qcpNCklb+vW40JnEq9CPLYZyUy8m2ZMHUxcGK3ywvRIAQ+uyaFkbOuyBWHxcz+UfBUdupZWmkqxmZ9HsibGs8tW3KcwdFSRg8S46U7No3bUh9dc51qVarYy3er4UOta2L/0Wry8bh+MbY16c/lS77l4Br+uC3z6hXx2D6O/V7qXvxcbigPXLxA1rHzhXuV/Umqa+6AmVrtOn5vS4c/claOFpPnpEl1+daHppNdPyLTHb7YklVN2awVGaJgZCKOQCVwIZBgQW2z3/eBiNfVICnxt7Sm5q/flMCwMYCVGXOx/BBfzBWh56ZB+6fLx7KO9eRgrqRI/XhdnXorK4WlJlnD3jSG8veBz912fLOt3+/VGaZ1xQ4x9nGKkgBtgc5PeO/qA64298Ey+OU+cFE4pMJBdOEfoxWBr0yzbbyKNuJXIDK1PqqabzemPl/BX6padkIp75WMCTE7ZOi8Y5/ByXR96HWM=
+    secure: EbQ6p5j+n+9NUjGJZgPqHdMWIgGPg+tjLLgwUftISdBna6qb/HsEbifeI0a46K7kyO+fz/rXXBsjC7QxN6JsH3tPyARWAlv4qRk4C0SYOEbhzdrcyhlXQg4KngmtSvdZt0C0CJTLW27mUfuT4p656sh/iLM7ufQGMsJcphK8hUO+VAUHYfeSFW9EvuOOVkh4BdI0H5ZyawKqSEr+JRpc8WD3iyRCVgxr1ECz4qpuroGmiXiLuxUAcytLATpm2No99RL+ggWhy6FMr5XLH34BG1Kz787hGrJBQt+3jkWhkQkJ00AvN1ak5GpD/9tyee7gR5zWphArsiQazOgO2hWv3M5m0i1OBBVpQmph6hmOsoCzEEX9hhUAsi7Sl1s5fY+S3/OzjMxochv4CVvc1RrPBzKvnxsC5ZVM8MdJQlNXJ3RonwmWIzIMTB07azXlkmX7n14bPpKgJGAN4NOm5XZNyqgGLdTBJtpj1KhKRZl+b+mFsrkk/3L4uRnukTyAlixv2DE64ovALRPs2yOAiOC4Dfowobya+q/ZzYcTcnRAkC73KdC6b51+f6aVmoFfqF+8L0f4q95l1VCoffPZbxAGrOat6r9WWHCILlC3dFU9QjspPLSvD8WmnMdOOBiox/JuVL/KXQnCUc0yTDA2tymABAovCvQkT89iR8GD9gidF2I=
   file_glob: true
-  file: RODPS*.tar.gz
+  file: ./RODPS*.tar.gz
   skip_cleanup: true
   on:
     tags: true
