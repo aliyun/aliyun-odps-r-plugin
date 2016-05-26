@@ -26,5 +26,8 @@ cp log4j.properties $libpath
 #tar R odps package
 tar zcvf $RPackageName RODPS
 
+mkdir target
+mv $RPackageName target/
+
 
 echo "Generate $RPackageName $basepath at $d"

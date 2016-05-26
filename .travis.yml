@@ -1,16 +1,14 @@
 language: java
 jdk: openjdk6
-install: sh ./build.sh
+install: cd java && mvn package -DskipTests && cd -
 script: sh ./build.sh
-before_deploy:
-- export RELEASE_JARS=$(ls ./RODPS*.tar.gz)
-- echo "deploying RELEASE_JARS to GitHub releases"
 deploy:
   provider: releases
   api_key:
     secure: EbQ6p5j+n+9NUjGJZgPqHdMWIgGPg+tjLLgwUftISdBna6qb/HsEbifeI0a46K7kyO+fz/rXXBsjC7QxN6JsH3tPyARWAlv4qRk4C0SYOEbhzdrcyhlXQg4KngmtSvdZt0C0CJTLW27mUfuT4p656sh/iLM7ufQGMsJcphK8hUO+VAUHYfeSFW9EvuOOVkh4BdI0H5ZyawKqSEr+JRpc8WD3iyRCVgxr1ECz4qpuroGmiXiLuxUAcytLATpm2No99RL+ggWhy6FMr5XLH34BG1Kz787hGrJBQt+3jkWhkQkJ00AvN1ak5GpD/9tyee7gR5zWphArsiQazOgO2hWv3M5m0i1OBBVpQmph6hmOsoCzEEX9hhUAsi7Sl1s5fY+S3/OzjMxochv4CVvc1RrPBzKvnxsC5ZVM8MdJQlNXJ3RonwmWIzIMTB07azXlkmX7n14bPpKgJGAN4NOm5XZNyqgGLdTBJtpj1KhKRZl+b+mFsrkk/3L4uRnukTyAlixv2DE64ovALRPs2yOAiOC4Dfowobya+q/ZzYcTcnRAkC73KdC6b51+f6aVmoFfqF+8L0f4q95l1VCoffPZbxAGrOat6r9WWHCILlC3dFU9QjspPLSvD8WmnMdOOBiox/JuVL/KXQnCUc0yTDA2tymABAovCvQkT89iR8GD9gidF2I=
   file_glob: true
-  file: ./RODPS*.tar.gz
+  file: ./target/RODPS*.tar.gz
   skip_cleanup: true
+  overwrite: true
   on:
     tags: true
