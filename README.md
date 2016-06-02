@@ -25,11 +25,25 @@
 ./build.sh
 ```
 
-### Install R package
 
+### Install the dependencies
 
 ```
-sudo R CMD INSTALL RODPS
+install.packages('DBI')
+install.packages('rJava')
+install.packages('SQLite')
+```
+Or you can use `devtools` to help you resolve dependencies:
+
+```
+install.packages('devtools')
+``` 
+
+
+### Install RODPS package
+
+```
+install.packages('path/to/RODPS_X_Y.tar.gz')
 ```
 
 
@@ -53,6 +67,8 @@ See the configuration template: `odps_config.ini.template`
 >  
 > tbl1 <- rodps.table.read("tbl1")  # read dataframe from ODPS
 > d <- head(tbl1)
+>
+> rodps.sql('create table test_table(id bigint);')   # execute sql 
 >
 > names(iris) <- gsub("\\.","_",names(iris))   # rename columns
 > rodps.table.write(iris, 'iris')              # write dataframe to ODPS
