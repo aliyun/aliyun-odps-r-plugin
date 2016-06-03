@@ -62,7 +62,7 @@ public class ROdps {
   private final Odps odps;
   private final String DT_ENDPOINT;
   private final static int RETRY_MAX = 3;
-  private final static String PROG_VERSION="r-odps-sdk-1.0";
+  private final static String PROG_VERSION="r-odps-sdk-1.2";
   private final String LOGVIEW_HOST;
   private String bizId = null;
 
@@ -486,7 +486,7 @@ public class ROdps {
 
     try {
       SQLTask sqlTask = new SQLTask();
-      sqlTask.setName("ropds_sql_task");
+      sqlTask.setName("rodps_sql_task");
       sqlTask.setQuery(sql);
       if (!StringUtils.isNullOrEmpty(this.bizId)) {
         sqlTask.setProperty("biz_id", this.bizId);

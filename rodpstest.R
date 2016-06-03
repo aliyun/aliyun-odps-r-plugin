@@ -19,6 +19,7 @@ check.case <- function()
 
 
 library('RODPS')
+rodps.bizid('012345^')
 current.prj <- rodps.project.current()
 
 #
@@ -162,4 +163,3 @@ max_index<-function(v) {names(v)[which(v==max(v))]}
 v1 = apply(v, 1, max_index)
 any(d$species_predict != v1)
 check.case()
-

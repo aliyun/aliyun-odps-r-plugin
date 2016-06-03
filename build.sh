@@ -7,7 +7,7 @@ jarpath=$basepath/java/target
 libpath=$basepath/RODPS/inst/lib
 ThirdLibPath=$basepath/java/target/lib
 RODPSPath=$basepath/RODPS
-RPackageName="RODPS_1.1.tar.gz"
+RPackageName="RODPS_1.2.tar.gz"
 
 echo "Start build R package in $basepath at $d"
 
