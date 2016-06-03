@@ -59,7 +59,7 @@ rodps.table.desc <- function(full.tablename,partition=NULL)
 	if(is.null(projectname)){
       projectname <- rodps.project.current()
     }
-	
+
     .check.tablename(tablename)
     tableMeta <- odpsOperator$describeTable(.jnew("java/lang/String",projectname), tablename, partition)
     ret<-.change.to.list(tableMeta)
@@ -101,7 +101,7 @@ rodps.table.exist <- function(full.tablename, partition=NULL)
 	if(is.null(projectname)){
       projectname <- rodps.project.current()
     }
-	
+
     .check.tablename(tablename)
     tableExist <- odpsOperator$isTableExist(.jnew("java/lang/String",projectname), tablename, partition);
     return(tableExist)
@@ -116,11 +116,11 @@ rodps.table.exist <- function(full.tablename, partition=NULL)
     tmptable <- paste("rodps_result_",postfix,sep="")
     query <- paste("CREATE TABLE ", tmptable," LIFECYCLE 3 AS ", query,sep="")
 
-    
+
     odpsOperator$runSqlTask(query)
     length <- rodps.table.size(tmptable)
-	
-	
+
+
     if(length > memsize) {
         x <- tmptable
         attr(x,"result:size") <- length
@@ -145,6 +145,11 @@ rodps.project.use<-function(projectname){
     odpsOperator$useProject(projectname)
 }
 
+rodps.bizid <- function(bizid) {
+    .check.init();
+    odpsOperator$setBizId(bizid)
+}
+
 rodps.sql <- function(query)
 {
     .check.init();
@@ -155,7 +160,7 @@ rodps.sql <- function(query)
     if(as.logical(type) && type==TRUE){
         stop(error("input_query_error",paste("rodps.sql does not support '",query,"' command",sep="")))
     }
-    
+
     #set odps.instance.priority
     if(grepl("set",query)&&grepl("odps.instance.priority",query)&&grepl("[",query,fixed = TRUE)&&grepl("]",query,fixed = TRUE)){
       query_1 <- strsplit(query,'[',fixed=TRUE)
@@ -174,8 +179,8 @@ rodps.sql <- function(query)
         return(TRUE)
       }
     }
-    
-    
+
+
     if(type=="select"){
         return(.rodps.bigSql(query))
     }
@@ -206,11 +211,11 @@ blacklist<-function(query){
     if(head=="use" || head=="read"){
         return(TRUE)
     }
-    return(head) 
+    return(head)
 }
 
 rodps.table.size <- function(full.tablename, partition=NULL)
-{	
+{
 	.check.init();
     p.t <- rodps.split.ftn( full.tablename )
     projectname <- p.t$projectname
@@ -218,9 +223,9 @@ rodps.table.size <- function(full.tablename, partition=NULL)
 
 	.check.tablename(tablename)
 	size<-odpsOperator$getTableSize(.jnew("java/lang/String",projectname), tablename,partition);
-	
+
 	return(size)
-	
+
 }
 
 #dataframe can be written to a non-exist table or partition
@@ -234,7 +239,7 @@ rodps.table.write <- function(dataframe, full.tablename, partition=NULL, tableco
 	if(is.null(projectname)){
       projectname <- rodps.project.current()
     }
-	
+
     .check.tablename(tablename)
     if( !is.data.frame(dataframe)){
         stop('dataframe should be class of data.frame')
@@ -247,7 +252,7 @@ rodps.table.write <- function(dataframe, full.tablename, partition=NULL, tableco
     if(!is.null(partition) && !rodps.table.exist(full.tablename)){
         stop(sprintf("Table not exists,table=%s partition=%s",full.tablename,partition))
     }
-    sql <- NULL 
+    sql <- NULL
     if(!rodps.table.exist(full.tablename)){
         sql <- .rodps.generate.DDL(full.tablename, dataframe, tablecomment)
     }
@@ -337,7 +342,7 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
     tablename <- p.t$tablename
 
     .check.tablename(tablename)
-    tablesize <- rodps.table.size(full.tablename, partition=partition) 
+    tablesize <- rodps.table.size(full.tablename, partition=partition)
     if ((tablesize > memsize) && (limit== -1))
     {
         msg <- paste("whole table size (", tablesize, ") is larger than memsize (", memsize, "), can not be loaded.")
@@ -349,7 +354,7 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
     filename <- paste(tempdir(), filename, sep= .Platform$file.sep)
     options(op)
     results <- odpsOperator$loadTableFromDT(projectname, tablename, partition, filename, NULL, NULL, as.integer(limit),as.integer(thread));
-    
+
     if (3 != results$size()) {
         stop("Internal error with load table from dt, please contact kai.xu")
     }
@@ -489,7 +494,7 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
         vlist <- c(0:(data$size()-1))
         for(pos in vlist){
             dfitem <- data$get(as.integer(pos))
-            rdata[[pos + 1]] <- .change.type(dfitem$getType())			
+            rdata[[pos + 1]] <- .change.type(dfitem$getType())
             names(rdata)[pos + 1] <- dfitem$getName()
             values <- dfitem$getData()
             if(values$size()>0){
@@ -517,7 +522,7 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
     }else{
         return(as.character(value))
     }
-} 
+}
 .change.type <- function(type){
     type<-tolower(type)
     rtype <- rodps.type.java2r[type]
@@ -531,7 +536,7 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
         return(date())
     }
     return(eval(parse(text=paste(rtype,"()",sep=""))))
-} 
+}
 
 .check.tablename<-function(tablename){
     if(is.null(tablename) || tablename==""){
@@ -544,7 +549,7 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
 
 .data.frame.get.namelist <- function(dataframe)
 {
-    if (!is.data.frame(dataframe)) 
+    if (!is.data.frame(dataframe))
         stop("input data is not data frame")
     retlist <- .jnew("java/util/ArrayList")
     columnnum <- length(dataframe)
@@ -557,7 +562,7 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
 
 .data.frame.get.typelist <- function(dataframe)
 {
-    if (!is.data.frame(dataframe)) 
+    if (!is.data.frame(dataframe))
         stop("input data is not data frame")
     retlist <- .jnew("java/util/ArrayList")
     columnnum <- length(dataframe)
@@ -570,7 +575,7 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
 
 .data.frame.to.arraylist <- function(dataframe)
 {
-    if (!is.data.frame(dataframe)) 
+    if (!is.data.frame(dataframe))
         stop("input data is not data frame")
 
     retlist <- .jnew("java/util/ArrayList")
@@ -598,8 +603,8 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
 
 .check.column.name <-function(colname)
 {
-    if( length(grep('[.]|[$]', colname)) >0 || 
-        nchar(colname) > 128 || 
+    if( length(grep('[.]|[$]', colname)) >0 ||
+        nchar(colname) > 128 ||
         substr(colname,1,1) == '_')
       stop( paste('Invalid column name',colname) )
 }
@@ -623,7 +628,7 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
 
     sql <- paste(" CREATE TABLE ",full.tablename," (\n",sep="")
     ncol <- length( namelist )
-    ntype <- length( typelist ) 
+    ntype <- length( typelist )
 
     for( i in seq(1,ncol )){
       if (i != ncol ){
@@ -678,7 +683,7 @@ rodps.table.sample.srs <- function(srctable,tgttable, samplerate, cond=NULL, sel
             sql <- paste( sql , ' WHERE ' , cond)
         }
     }
-    
+
     distby = sprintf(' DISTRIBUTE BY rand(%d)*10 SORT BY rand(%d)', rv[1], rv[2])
     if( samplerate<1 ){
         #sample by percentage
@@ -733,7 +738,7 @@ rodps.table.sample.strat <- function(srctable, tgttable, samplerate, strat,selec
     if( rodps.table.exist(tgttable)){
         stop('target table already exists')
     }
-    
+
     rv <- round(runif(3)*100)
     if( is.null(select) ){
         des <- rodps.table.desc( srctable )
@@ -752,7 +757,7 @@ rodps.table.sample.strat <- function(srctable, tgttable, samplerate, strat,selec
     else{
         sql <- paste(sql, ' WHERE sel_rownumber <= ', samplerate)
     }
-    
+
     ret <- try(rodps.sql( sql ) )
     if( 'try-error' %in% class(ret)){
         cat('Exception occurred when executing sql\n')
@@ -778,12 +783,12 @@ rodps.table.rows <- function(full.tablename, partition=NULL)
         if(!is.null(partition) && partition!=""){
             sql <- paste(sql, "partition(", partition, ")")
         }
-        v <- rodps.sql( sql ) 
+        v <- rodps.sql( sql )
         ret <- as.numeric( v[[2]] )
     }
     else{
         sql <- sprintf( 'select count(*) from %s', full.tablename )
-        v <- rodps.sql( sql ) 
+        v <- rodps.sql( sql )
         ret <- as.numeric(v[1 , 1])
     }
     return( ret )
