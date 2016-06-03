@@ -65,6 +65,7 @@ public class ROdpsTest extends TestCase {
                     conf.get("dt_end_point"),
                     conf.get("logview_host"),
                     "");
+    rodps.setBizId("012345^");
     assertNotNull(rodps);
     rodps.runSqlTask("create table if not exists " + table + "(id int) comment 'This is the test table for ROdps';");
   }

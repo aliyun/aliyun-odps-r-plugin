@@ -53,6 +53,7 @@ import com.aliyun.odps.rodps.DataTunnel.ROdpsException;
 import com.aliyun.odps.task.SQLTask;
 import com.aliyun.odps.tunnel.TableTunnel.DownloadSession;
 import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
+import com.aliyun.odps.utils.StringUtils;
 
 public class ROdps {
 
@@ -63,6 +64,7 @@ public class ROdps {
   private final static int RETRY_MAX = 3;
   private final static String PROG_VERSION="r-odps-sdk-1.0";
   private final String LOGVIEW_HOST;
+  private String bizId = null;
 
   public ROdps(String projectName, String accessID, String accessKey, String endPoint,
       String dtEndpoint, String logviewHost, String log4j_properties) throws ROdpsException,
@@ -87,6 +89,10 @@ public class ROdps {
     odps.setEndpoint(endPoint);
     odps.setDefaultProject(projectName);
     odps.setUserAgent(PROG_VERSION);
+  }
+
+  public void setBizId(String s) {
+    this.bizId = s;
   }
 
   // use tunnel sdk to download table
@@ -479,10 +485,14 @@ public class ROdps {
     LOG.debug("sql: " + sql);
 
     try {
-      Map<String, String> hint = new LinkedHashMap<String, String>();
-      Map<String, String> alias = new LinkedHashMap<String, String>();
-      Instance
-          instance = SQLTask.run(odps, odps.getDefaultProject(), sql, "ropds_sql_task", hint, alias);
+      SQLTask sqlTask = new SQLTask();
+      sqlTask.setName("ropds_sql_task");
+      sqlTask.setQuery(sql);
+      if (!StringUtils.isNullOrEmpty(this.bizId)) {
+        sqlTask.setProperty("biz_id", this.bizId);
+        LOG.debug("biz_id: " + this.bizId);
+      }
+      Instance instance = odps.instances().create(sqlTask);
       LogView logView = new LogView(odps);
       if (LOGVIEW_HOST != null) {
         logView.setLogViewHost(LOGVIEW_HOST);
