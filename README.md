@@ -11,22 +11,13 @@
 - The small data set can be processed directly in R.
 
 
-## Requirements
-
-- Java 6+
-- R 1.80+
-
-
 ## Installation
 
-### Build R package
+1.Download the package:
 
-```
-./build.sh
-```
+[Release page](https://github.com/aliyun/aliyun-odps-r-plugin/releases)
 
-
-### Install the dependencies
+2.Install the dependencies:
 
 ```
 install.packages('DBI')
@@ -37,26 +28,22 @@ Or you can use `devtools` to help you resolve dependencies:
 
 ```
 install.packages('devtools')
-``` 
+```
 
-
-### Install RODPS package
+3.Install RODPS package:
 
 ```
 install.packages('path/to/RODPS_X_Y.tar.gz')
 ```
 
-
-### Configuration
-
-Please make sure the environment variable `RODPS_CONFIG` is set to `path/to/odps_config.ini`
+4.Please make sure the environment variable `RODPS_CONFIG` is set to `path/to/odps_config.ini`
 
 
 ```
 export RODPS_CONFIG=path/to/odps_config.ini
 ```
 
-See the configuration template: `odps_config.ini.template`
+See the configuration template: [odps_config.ini.template](https://github.com/aliyun/aliyun-odps-r-plugin/blob/master/odps_config.ini.template)
 
 
 ## Getting Started
@@ -82,6 +69,22 @@ See the configuration template: `odps_config.ini.template`
 > rodps.predict.rpart(fit, srctbl='iris',tgttbl='iris_p') # modeling
 ```
 
+## Requirements
+
+- Java 6+
+- R 1.80+
+
+## Developer Notes
+
+### Architecture
+
+[![](mindmap-thumb.png)](mindmap.pdf)
+
+### Testing
+
+```
+Rscript rodpstest.R
+```
 
 ## Authors && Contributors
 
