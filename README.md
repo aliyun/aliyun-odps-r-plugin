@@ -70,11 +70,13 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 ```
 
 ## Requirements
-
 - Java 6+
 - R 1.80+
 
-## Developer Notes
+### Library Dependence
+- rJava
+- DBI
+- RSQLite
 
 ### Architecture
 
@@ -88,8 +90,7 @@ Rscript rodpstest.R
 
 ## Authors && Contributors
 
-- [Yang Hongbo](https://github.com/hongbosoftware)
-- [Yao Weidong](https://github.com/yaoweidong)
+- [Xia Mingchao](https://github.com/cobbxia)
 
 
 ## License

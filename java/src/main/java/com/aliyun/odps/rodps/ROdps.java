@@ -60,17 +60,19 @@ public class ROdps {
   static Log LOG = LogFactory.getLog(ROdps.class);
   private String ODPS_PROJECT_NAME;
   private final Odps odps;
-  private final String DT_ENDPOINT;
+  private String DT_ENDPOINT;
   private final static int RETRY_MAX = 3;
-  private final static String PROG_VERSION="r-odps-sdk-1.2";
-  private final String LOGVIEW_HOST;
+  private final static String PROG_VERSION = "rodps-1.3";
+  private String LOGVIEW_HOST;
   private String bizId = null;
+
+
 
   public ROdps(String projectName, String accessID, String accessKey, String endPoint,
       String dtEndpoint, String logviewHost, String log4j_properties) throws ROdpsException,
       OdpsException {
 
-    if (log4j_properties.isEmpty())
+    if (log4j_properties == null||log4j_properties.isEmpty())
       LOG = LogFactory.getLog(ROdps.class);
     else {
       PropertyConfigurator.configure(log4j_properties);
@@ -89,6 +91,14 @@ public class ROdps {
     odps.setEndpoint(endPoint);
     odps.setDefaultProject(projectName);
     odps.setUserAgent(PROG_VERSION);
+    if (DT_ENDPOINT != null && DT_ENDPOINT.length() != 0) {
+      System.out.println("tunnel router is closed,use your DT_ENDPOINT.");
+      // System.exit(0);
+    }
+    if (LOGVIEW_HOST == null || LOGVIEW_HOST.length() == 0) {
+      LOGVIEW_HOST = "http://logview.odps.aliyun-inc.com:8080";// internal
+      // LOGVIEW_HOST ="http://logview.odps.aliyun.com"; //external
+    }
   }
 
   public void setBizId(String s) {
@@ -502,11 +512,11 @@ public class ROdps {
       LOG.info(logViewUrl);
       instance.waitForSuccess();
       Map<String, String> results = instance.getTaskResults();
-      String result = results.get("ropds_sql_task");
-      if (result.isEmpty()) {
+      String result = results.get("rodps_sql_task");
+      if (result == null||result.isEmpty()) {
         return new ArrayList<String>();
       }
-      return Arrays.asList(results.get("ropds_sql_task").split("\n"));
+      return Arrays.asList(results.get("rodps_sql_task").split("\n"));
     }
 
     catch (Exception e) {

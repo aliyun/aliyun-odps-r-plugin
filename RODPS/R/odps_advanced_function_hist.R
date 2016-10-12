@@ -13,7 +13,7 @@ hist.rodps.vector <- function( ov )
   rodps.table.hist( ov@tbl, ov@col)
 }
 
-rodps.table.hist <- function( tblname, colname ,breaks=NULL,
+rodps.table.hist <- function( tablename, colname ,breaks=NULL,
                         freq=TRUE,
                         include.lowest = TRUE, right=TRUE,
                         main=paste("Histogram of ", colname),
@@ -81,3 +81,4 @@ rodps.table.hist <- function( tblname, colname ,breaks=NULL,
  plot( h , freq=freq, main=main, xlab=xlab,...)
  invisible( h )
 }
+rodps.hist <- rodps.table.hist
