@@ -25,11 +25,15 @@ rodps.init <- function(path=NULL, access.id=NULL, access.key=NULL){
 
 
 .init_odps_operator <- function(conf){
+     if(!is.na(conf["dt_end_point"])){
+        print("dt_end_point is set,use user dt_end_point ,highly recommanded NOT set dt_end_point")
+     }
      if(is.na(conf['log4j_properties'])){
          odpsOperator <<- .jnew("com/aliyun/odps/rodps/ROdps", conf["project_name"],conf["access_id"],conf["access_key"] , conf["end_point"], conf["dt_end_point"], conf["logview_host"],"")
      }
      else{
-         odpsOperator <<- .jnew("com/aliyun/odps/rodps/ROdps", conf["project_name"],conf["access_id"],conf["access_key"] , conf["end_point"], conf["dt_end_point"], conf["logview_host"], .jnew("java/lang/String",conf["log4j_properties"]))}
+         odpsOperator <<- .jnew("com/aliyun/odps/rodps/ROdps", conf["project_name"],conf["access_id"],conf["access_key"] , conf["end_point"], conf["dt_end_point"], conf["logview_host"], .jnew("java/lang/String",conf["log4j_properties"]))
+     }
      rodps.init.type()
 }
 

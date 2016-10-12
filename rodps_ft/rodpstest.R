@@ -1,4 +1,4 @@
-test.dir="."
+test.dir="testout"
 base.dir="testbase"
 cur.test=NULL
 current.prj=NULL
@@ -7,50 +7,47 @@ other.prj=NULL
 
 mark <- function( case.title )
 {
-  # sink( sprintf('%s/%s.out',test.dir,case.title), type=c("output","message"))
+  print(paste("#################case:",case.title,"##########################"))
+  sink( sprintf('%s/%s.out',test.dir,case.title), type=c("output","message"))
   cat(sprintf('########### RODPS %s###########\n',case.title))
 }
 
 check.case <- function()
 {
-  cat("done\n")
-  # sink()
+  sink()
 }
 
 
 library('RODPS')
-rodps.bizid('012345^')
+rodps.init("./odps_config.ini_newdailyrun")
 current.prj <- rodps.project.current()
-
+rodps.bizid('012345^')
 #
 mark('listtable')
-x <- rodps.table.list()
-head(x)
+rodps.table.list()
 check.case()
 
 #
 mark('list_partition')
-rodps.sql('drop table if exists test_partition')
-rodps.sql('create table if not exists test_partition (id bigint) partitioned by (ds string)')
-rodps.sql('alter table test_partition add partition (ds="20111111")')
-rodps.sql('alter table test_partition add partition (ds="20111112")')
+rodps.sql("drop table test_partition")
+rodps.sql("create table test_partition(id string) partitioned by(pt string)")
+rodps.sql("alter table test_partition add partition(pt='20140531')")
 rodps.table.partitions('test_partition')
-rodps.table.drop('test_partition')
 check.case()
 
 #
 mark('create_drop_table')
 rodps.sql("create table if not exists rodps_drop_table(a string)")
-x <- rodps.table.desc('rodps_drop_table')
-x
+rodps.table.desc('rodps_drop_table')
 rodps.table.drop( 'rodps_drop_table' )
 rodps.sql("create table if not exists rodps_drop_table(a string)")
 rodps.table.drop( paste(current.prj,'.','rodps_drop_table',sep="") )
-rodps.table.exist('odps_public_dev.rodps_drop_table')
+rodps.table.exist(paste(current.prj,"rodps_drop_table",sep="."))
 check.case()
 
 ## creat table[dual] for test
-rodps.sql('create table if not exists dual(a string)')
+#rodps.sql('create table if not exists dual(a string)')
+#check.case()
 
 #
 mark('desc_table')
@@ -97,9 +94,10 @@ rodps.table.read(paste(current.prj,".","dual",sep=""))
 rodps.table.drop('rodps_load_write_table')
 rodps.sql('create table rodps_load_write_table(c_couble double, c_string string, c_boolean boolean, c_datetime datetime, c_bigint bigint )')
 rodps.sql('insert into table rodps_load_write_table select 1.1, "abc",true,to_date("20130101","yyyymmdd"), 10000 from (select count(*) from rodps_load_write_table) a')
-#rodps.sql('insert into table rodps_load_write_table select null, null,null,null, null from dual')
 rodps.sql('insert into table rodps_load_write_table select -1.1, "ab\\nc",false,to_date("99991231","yyyymmdd"), -10000 from (select count(*) from rodps_load_write_table) a')
-rodps.table.read('rodps_load_write_table')
+
+x<-rodps.table.read('rodps_load_write_table')
+x
 check.case()
 
 
@@ -163,3 +161,4 @@ max_index<-function(v) {names(v)[which(v==max(v))]}
 v1 = apply(v, 1, max_index)
 any(d$species_predict != v1)
 check.case()
+

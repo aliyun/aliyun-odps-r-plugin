@@ -20,11 +20,18 @@ rodps.table.list <- function(pattern=NULL, projectname=NULL)
     }
     return(.change.data(tables))
 }
+
+rodps.list.table <- rodps.table.list 
+rodps.list.tables <- rodps.table.list 
+
 rodps.table.partitions <- function(full.tablename){
     .check.init();
     df <- rodps.sql(paste("show partitions",full.tablename))
     return(df)
 }
+
+rodps.partitions.table <- rodps.table.partitions
+
 rodps.table.drop <- function(full.tablename, partition=NULL)
 {
     .check.init();
@@ -48,6 +55,8 @@ rodps.table.drop <- function(full.tablename, partition=NULL)
     rodps.sql( sql )
     return(TRUE)
 }
+
+rodps.drop.table <- rodps.table.drop
 
 rodps.table.desc <- function(full.tablename,partition=NULL)
 {
@@ -73,6 +82,9 @@ rodps.table.desc <- function(full.tablename,partition=NULL)
     }
     return(ret)
 }
+
+rodps.desc.table <- rodps.table.desc
+
 #将pt|string| 转成dataframe
 .column.to.dataframe <-function(cols){
     len<-length(cols)
@@ -106,6 +118,8 @@ rodps.table.exist <- function(full.tablename, partition=NULL)
     tableExist <- odpsOperator$isTableExist(.jnew("java/lang/String",projectname), tablename, partition);
     return(tableExist)
 }
+
+rodps.exist.table <- rodps.table.exist
 
 .rodps.bigSql <- function(query , memsize = 10737518240 ) {
     .check.init();
@@ -197,6 +211,9 @@ rodps.sql <- function(query)
     }
     return(vlist)
 }
+
+rodps.query <- rodps.sql
+
 #不支持运行的query
 blacklist<-function(query){
     tokens<-strsplit(tolower(query),"\\s+",fixed=FALSE)
@@ -227,6 +244,8 @@ rodps.table.size <- function(full.tablename, partition=NULL)
 	return(size)
 
 }
+
+rodps.size.table <- rodps.table.size
 
 #dataframe can be written to a non-exist table or partition
 rodps.table.write <- function(dataframe, full.tablename, partition=NULL, tablecomment=NULL,isdebug=FALSE,thread=8)
@@ -293,6 +312,8 @@ rodps.table.write <- function(dataframe, full.tablename, partition=NULL, tableco
     }
     return(TRUE)
 }
+
+rodps.write.table <- rodps.table.write
 
 .dataframe.to.sqlite <- function(dataframe, thread, filename, tablename, isdebug) {
     if(!require(DBI,quietly=TRUE)) {
@@ -364,6 +385,9 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
     }
     return(res)
 }
+
+rodps.read.table <- rodps.table.read
+rodps.load.table <- rodps.table.read
 
 .sqlite.to.dataframe <- function(dbs, coltype, tablename, isdebug)
 {
@@ -703,6 +727,7 @@ rodps.table.sample.srs <- function(srctable,tgttable, samplerate, cond=NULL, sel
     }
     return(T)
 }
+rodps.sample.srs <- rodps.table.sample.srs
 
 #分层抽样
 #select
@@ -767,6 +792,7 @@ rodps.table.sample.strat <- function(srctable, tgttable, samplerate, strat,selec
     return(TRUE)
 
 }
+rodps.sample.strat <- rodps.table.sample.strat
 
 rodps.table.rows <- function(full.tablename, partition=NULL)
 {
@@ -784,7 +810,7 @@ rodps.table.rows <- function(full.tablename, partition=NULL)
             sql <- paste(sql, "partition(", partition, ")")
         }
         v <- rodps.sql( sql )
-        ret <- as.numeric( v[[2]] )
+        ret <- as.numeric( v[[1]] )
     }
     else{
         sql <- sprintf( 'select count(*) from %s', full.tablename )
@@ -794,11 +820,15 @@ rodps.table.rows <- function(full.tablename, partition=NULL)
     return( ret )
 }
 
+rodps.rows.table <- rodps.table.rows
+
 rodps.project.current <- function()
 {
     .check.init();
     return(odpsOperator$getProjectName(""))
 }
+
+rodps.current.project <- rodps.project.current
 
 #split full table name into table name and project name
 rodps.split.ftn <- function( ftn )
