@@ -1,6 +1,6 @@
 language: java
 jdk: openjdk6
-install: cd java && mvn package -DskipTests && cd -
+install: cp pom.xml ./java && cd java && mvn package -DskipTests && cd -
 script: sh ./build.sh
 deploy:
   provider: releases
