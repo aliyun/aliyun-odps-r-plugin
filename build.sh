@@ -1,4 +1,5 @@
-#! /bin/bash
+#!/bin/bash
+
 source ./config.sh
 d=`date +%Y%m%d" "%H:%M:%S`
 basepath=$(cd "$(dirname "$0")";pwd)
