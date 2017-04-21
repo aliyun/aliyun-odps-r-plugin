@@ -17,19 +17,13 @@
 package com.aliyun.odps.rodps;
 
 
-import java.io.BufferedReader;
-import java.io.CharArrayWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.aliyun.odps.*;
+import com.aliyun.odps.account.AliyunAccount;
+import com.aliyun.odps.rodps.DataTunnel.*;
+import com.aliyun.odps.task.SQLTask;
+import com.aliyun.odps.tunnel.TableTunnel.DownloadSession;
+import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
+import com.aliyun.odps.utils.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
@@ -37,23 +31,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.aliyun.odps.Instance;
-import com.aliyun.odps.LogView;
-import com.aliyun.odps.Odps;
-import com.aliyun.odps.OdpsException;
-import com.aliyun.odps.PartitionSpec;
-import com.aliyun.odps.Project;
-import com.aliyun.odps.Table;
-import com.aliyun.odps.account.AliyunAccount;
-import com.aliyun.odps.rodps.DataTunnel.Context;
-import com.aliyun.odps.rodps.DataTunnel.DataFrameItem;
-import com.aliyun.odps.rodps.DataTunnel.RDTDownloader;
-import com.aliyun.odps.rodps.DataTunnel.RDTUploader;
-import com.aliyun.odps.rodps.DataTunnel.ROdpsException;
-import com.aliyun.odps.task.SQLTask;
-import com.aliyun.odps.tunnel.TableTunnel.DownloadSession;
-import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
-import com.aliyun.odps.utils.StringUtils;
+import java.io.*;
+import java.util.*;
 
 public class ROdps {
 
@@ -604,27 +583,14 @@ public class ROdps {
     List<DataFrameItem> data = new ArrayList<DataFrameItem>();
     data.add(owner);
     data.add(tableName);
-    String sql = "show tables ";
-    if (pattern != null && !pattern.isEmpty()) {
-      sql += "'" + pattern + "'";
-    }
-    if (projectName != null && !projectName.isEmpty()) {
-      sql += " in " + projectName;
-    }
-    sql += ";";
-    List<String> ret = this.runSqlTask(sql);
 
-    if (ret == null || ret.size() == 0) {
-      return data;
-    }
+    TableFilter filter = new TableFilter();
+    filter.setName(pattern);
 
-    for (String line : ret) {
-      String[] items = line.split(":");
-      if (items.length != 2) {
-        throw new ROdpsException("expected to be two items");
-      }
-      owner.getData().add(items[0]);
-      tableName.getData().add(items[1]);
+    for (Iterator<Table> it = odps.tables().iterator(projectName, filter); it.hasNext();) {
+      Table tb = it.next();
+      owner.getData().add(tb.getOwner());
+      tableName.getData().add(tb.getName());
     }
     return data;
   }
