@@ -6,23 +6,22 @@ rodps.help <- function()
 rodps.table.list <- function(pattern=NULL, projectname=NULL)
 {
     .check.init();
-    cur.prj <- rodps.project.current()
-    if( ! is.null(projectname)){
-        rodps.project.use( projectname )
+
+    if(is.null(projectname)){
+      projectname <- rodps.project.current()
+    } else {
+      rodps.project.use( projectname )
     }
 
-    tables <- try(odpsOperator$getTables(NULL, pattern))
-    if( ! is.null(projectname)){
-        rodps.project.use( cur.prj )
-    }
+    tables <- try(odpsOperator$getTables(projectname, pattern))
     if("try-error" %in% class( tables )) {
         stop('Exception occured when listing tables')
     }
     return(.change.data(tables))
 }
 
-rodps.list.table <- rodps.table.list 
-rodps.list.tables <- rodps.table.list 
+rodps.list.table <- rodps.table.list
+rodps.list.tables <- rodps.table.list
 
 rodps.table.partitions <- function(full.tablename){
     .check.init();
