@@ -1,1 +1,1 @@
-RVERSION="1.3.1"
+RVERSION="1.3.2"

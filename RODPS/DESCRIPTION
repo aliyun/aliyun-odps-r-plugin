@@ -1,5 +1,5 @@
 Package: RODPS
-Version: 1.3.1
+Version: 1.3.2
 Title: R interface to interact with ODPS
 Description: This package is developed for R to interact with ODPS,
  which is the platform of Alibaba to process big data.
