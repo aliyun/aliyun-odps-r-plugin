@@ -91,7 +91,8 @@ Rscript rodpstest.R
 ## Authors && Contributors
 
 - [Xia Mingchao](https://github.com/cobbxia)
-
+- [Cheng Yichao](https://github.com/onesuper)
+- [Li Ruibo](https://github.com/lyman)
 
 ## License
 

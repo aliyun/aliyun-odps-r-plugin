@@ -13,10 +13,10 @@ Version: ${RVERSION}
 Title: R interface to interact with ODPS
 Description: This package is developed for R to interact with ODPS,
  which is the platform of Alibaba to process big data.
-Author: mingchao.xiamc@alibaba-inc.com
+Author: ruibo.lirb@alibaba-inc.com
 License: Apache License 2.0
 Depends: R (>= 1.8.0), rJava, DBI, RSQLite
 Imports: methods
-URL: http://gitlab.alibaba-inc.com/odps/rodps
+URL: http://github.com/aliyun/aliyun-odps-r-plugin
 Packaged: ${VERSIONDATE};  
 __EOF__

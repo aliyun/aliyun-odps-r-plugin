@@ -20,6 +20,7 @@
 } 
 \seealso{
  \code{\link{rodps.sql}},
+ \code{\link{rodps.set}},
  \code{\link{rodps.table}},
  \code{\link{rodps.project}}
 }

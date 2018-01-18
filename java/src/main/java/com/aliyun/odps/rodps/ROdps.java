@@ -16,14 +16,21 @@
 
 package com.aliyun.odps.rodps;
 
+import java.io.BufferedReader;
+import java.io.CharArrayWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.aliyun.odps.*;
-import com.aliyun.odps.account.AliyunAccount;
-import com.aliyun.odps.rodps.DataTunnel.*;
-import com.aliyun.odps.task.SQLTask;
-import com.aliyun.odps.tunnel.TableTunnel.DownloadSession;
-import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
-import com.aliyun.odps.utils.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
@@ -31,8 +38,24 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.*;
-import java.util.*;
+import com.aliyun.odps.Instance;
+import com.aliyun.odps.LogView;
+import com.aliyun.odps.Odps;
+import com.aliyun.odps.OdpsException;
+import com.aliyun.odps.PartitionSpec;
+import com.aliyun.odps.Project;
+import com.aliyun.odps.Table;
+import com.aliyun.odps.TableFilter;
+import com.aliyun.odps.account.AliyunAccount;
+import com.aliyun.odps.rodps.DataTunnel.Context;
+import com.aliyun.odps.rodps.DataTunnel.DataFrameItem;
+import com.aliyun.odps.rodps.DataTunnel.RDTDownloader;
+import com.aliyun.odps.rodps.DataTunnel.RDTUploader;
+import com.aliyun.odps.rodps.DataTunnel.ROdpsException;
+import com.aliyun.odps.task.SQLTask;
+import com.aliyun.odps.tunnel.TableTunnel.DownloadSession;
+import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
+import com.aliyun.odps.utils.StringUtils;
 
 public class ROdps {
 
@@ -44,7 +67,7 @@ public class ROdps {
   private final static String PROG_VERSION = "rodps-1.3";
   private String LOGVIEW_HOST;
   private String bizId = null;
-
+  private HashMap settings;
 
 
   public ROdps(String projectName, String accessID, String accessKey, String endPoint,
@@ -57,10 +80,10 @@ public class ROdps {
       PropertyConfigurator.configure(log4j_properties);
       LOG = LogFactory.getLog(ROdps.class);
     }
-    LOG.info("start to init Odps");
+    LOG.info("Init Odps");
     if (projectName.equals("NA") || accessID.equals("NA") || accessKey.equals("NA")
         || endPoint.equals("NA")) {
-      throw new ROdpsException("NA found with project/accessID/accessKey/endPoint");
+      throw new ROdpsException("No project/accessID/accessKey/endPoint");
     }
 
     ODPS_PROJECT_NAME = projectName;
@@ -71,17 +94,25 @@ public class ROdps {
     odps.setDefaultProject(projectName);
     odps.setUserAgent(PROG_VERSION);
     if (DT_ENDPOINT != null && DT_ENDPOINT.length() != 0) {
-      System.out.println("tunnel router is closed,use your DT_ENDPOINT.");
-      // System.exit(0);
+      LOG.info("use specified DT_ENDPOINT: " + DT_ENDPOINT);
     }
     if (LOGVIEW_HOST == null || LOGVIEW_HOST.length() == 0) {
-      LOGVIEW_HOST = "http://logview.odps.aliyun-inc.com:8080";// internal
-      // LOGVIEW_HOST ="http://logview.odps.aliyun.com"; //external
+      LOGVIEW_HOST = new LogView(odps).getLogViewHost();
     }
+
+    settings = new HashMap();
   }
 
   public void setBizId(String s) {
     this.bizId = s;
+  }
+
+  public void set(String key, String value) {
+    settings.put(key, value);
+  }
+
+  public void unset(String key) {
+    settings.remove(key);
   }
 
   // use tunnel sdk to download table
@@ -480,6 +511,11 @@ public class ROdps {
       if (!StringUtils.isNullOrEmpty(this.bizId)) {
         sqlTask.setProperty("biz_id", this.bizId);
         LOG.debug("biz_id: " + this.bizId);
+      }
+      if (!settings.isEmpty()) {
+        for (Object k : settings.keySet()) {
+          sqlTask.setProperty((String)k, (String)(settings.get(k)));
+        }
       }
       Instance instance = odps.instances().create(sqlTask);
       LogView logView = new LogView(odps);

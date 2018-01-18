@@ -163,6 +163,16 @@ rodps.bizid <- function(bizid) {
     odpsOperator$setBizId(bizid)
 }
 
+rodps.set <- function(key, value) {
+    .check.init();
+    odpsOperator$set(key, value)
+}
+
+rodps.unset <- function(key) {
+    .check.init();
+    odpsOperator$unset(key)
+}
+
 rodps.sql <- function(query)
 {
     .check.init();
