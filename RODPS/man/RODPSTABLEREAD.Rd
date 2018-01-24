@@ -20,7 +20,7 @@ rodps.table.read( full.tablename,partition = NULL,limit=-1,memsize=10737518240,i
 \email{yunyuan.zhangyy@alibaba-inc.com}
 }
 \examples{
-\dontrun{ x<-rodps.table.read('sales',limit=100) }
+\dontrun{ x<-rodps.table.read('sales',partition='ds=20180124',limit=100) }
 }
 \seealso{
  \code{\link{rodps.table.desc}},
