@@ -86,18 +86,28 @@ public class ROdps {
       throw new ROdpsException("No project/accessID/accessKey/endPoint");
     }
 
+    // trim input strings
+    projectName = projectName.trim();
+    accessID = accessID.trim();
+    accessKey = accessKey.trim();
+    endPoint = endPoint.trim();
+    if (dtEndpoint == null || dtEndpoint.equals("NA")) {
+      DT_ENDPOINT = null;
+    } else {
+      DT_ENDPOINT = dtEndpoint.trim();
+      LOG.info("use specified tunnel endpoint : " + DT_ENDPOINT);
+    }
+
     ODPS_PROJECT_NAME = projectName;
-    DT_ENDPOINT = dtEndpoint;
     LOGVIEW_HOST = logviewHost;
     odps = new Odps(new AliyunAccount(accessID, accessKey));
     odps.setEndpoint(endPoint);
     odps.setDefaultProject(projectName);
     odps.setUserAgent(PROG_VERSION);
-    if (DT_ENDPOINT != null && DT_ENDPOINT.length() != 0) {
-      LOG.info("use specified DT_ENDPOINT: " + DT_ENDPOINT);
-    }
-    if (LOGVIEW_HOST == null || LOGVIEW_HOST.length() == 0) {
+    if (logviewHost == null || logviewHost.equals("NA")) {
       LOGVIEW_HOST = new LogView(odps).getLogViewHost();
+    } else {
+      LOGVIEW_HOST = logviewHost.trim();
     }
 
     settings = new HashMap();

@@ -45,6 +45,9 @@ export RODPS_CONFIG=path/to/odps_config.ini
 
 See the configuration template: [odps_config.ini.template](https://github.com/aliyun/aliyun-odps-r-plugin/blob/master/odps_config.ini.template)
 
+### Trouble shooting
+
+- To windows users: when installing R, DO NOT install both 32bit and 64bit on your system, which will introduce compilation trouble in later installation of rJava.
 
 ## Getting Started
 

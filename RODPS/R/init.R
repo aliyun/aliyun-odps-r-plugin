@@ -25,16 +25,22 @@ rodps.init <- function(path=NULL, access.id=NULL, access.key=NULL){
 
 
 .init_odps_operator <- function(conf){
-     if(!is.na(conf["dt_end_point"])){
-        print("dt_end_point is set,use user dt_end_point ,highly recommanded NOT set dt_end_point")
-     }
-     if(is.na(conf['log4j_properties'])){
-         odpsOperator <<- .jnew("com/aliyun/odps/rodps/ROdps", conf["project_name"],conf["access_id"],conf["access_key"] , conf["end_point"], conf["dt_end_point"], conf["logview_host"],"")
-     }
-     else{
-         odpsOperator <<- .jnew("com/aliyun/odps/rodps/ROdps", conf["project_name"],conf["access_id"],conf["access_key"] , conf["end_point"], conf["dt_end_point"], conf["logview_host"], .jnew("java/lang/String",conf["log4j_properties"]))
-     }
-     rodps.init.type()
+    if (!is.na(conf["tunnel_endpoint"])) {
+        tunnel_endpoint <- conf["tunnel_endpoint"]
+    } else if (!is.na(conf["dt_end_point"])) {
+        tunnel_endpoint <- conf["dt_end_point"]
+    } else {
+        tunnel_endpoint <- "NA"
+        print("WARN: tunnel_endpoint not set, auto-routed tunnel endpoint might not work")
+    }
+    odpsOperator <<- .jnew("com/aliyun/odps/rodps/ROdps", conf["project_name"],
+                                                          conf["access_id"],
+                                                          conf["access_key"],
+                                                          conf["end_point"],
+                                                          tunnel_endpoint,
+                                                          conf["logview_host"],
+                                                          conf["log4j_properties"])
+    rodps.init.type()
 }
 
 init.java.env <- function(libname, pkgname)
