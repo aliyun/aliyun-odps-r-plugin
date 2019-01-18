@@ -1,1 +1,1 @@
-RVERSION="1.3.4-oversea"
+RVERSION="1.3.4"
