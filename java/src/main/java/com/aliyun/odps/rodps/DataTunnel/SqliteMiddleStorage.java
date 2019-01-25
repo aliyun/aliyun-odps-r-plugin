@@ -14,20 +14,30 @@
  */
 package com.aliyun.odps.rodps.DataTunnel;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+
 import org.sqlite.SQLiteConfig;
+
 import com.aliyun.odps.TableSchema;
-import com.aliyun.odps.data.Record;
+import com.aliyun.odps.data.ArrayRecord;
+import com.aliyun.odps.data.Binary;
+import com.aliyun.odps.data.Char;
+import com.aliyun.odps.data.IntervalDayTime;
+import com.aliyun.odps.data.IntervalYearMonth;
 import com.aliyun.odps.data.RecordReader;
 import com.aliyun.odps.data.RecordWriter;
+import com.aliyun.odps.data.Varchar;
 import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
+import com.aliyun.odps.type.TypeInfo;
 
 public class SqliteMiddleStorage<T> implements MiddleStorage {
   private final Connection conn;
@@ -57,7 +67,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
    * @throws Exception
    */
   public void saveDtData(RecordReader reader, long downloadRecordNumber) throws Exception {
-    Record record;
+    ArrayRecord record;
     long loadedRecordNum = 0;
     int batchSize = 10000;
     int columnNumber = context.getSchema().getColumns().size();
@@ -81,49 +91,153 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
       insPreStmt = this.conn.prepareStatement(insSql);
 
       while (loadedRecordNum < downloadRecordNumber) {
-        record = reader.read();
+        record = (ArrayRecord) reader.read();
         int i = 0;
         for (; i < columnNumber; i++) {
-          Object v = null;
-          switch (context.getSchema().getColumn(i).getType()) {
-          // int of r is 32bit,so convert int to double
-            case BIGINT:
-              v = record.getBigint(i);
-              if (v == null)
-                insPreStmt.setNull(i + 1, Types.DOUBLE);
-              else
-                insPreStmt.setDouble(i + 1, new Double((Long) v));
-              break;
-            case BOOLEAN:
-              v = record.getBoolean(i);
+          TypeInfo colType = context.getSchema().getColumn(i).getTypeInfo();
+          switch (colType.getOdpsType()) {
+            case BOOLEAN: {
+              Boolean v = record.getBoolean(i);
               if (v == null)
                 insPreStmt.setNull(i + 1, Types.BOOLEAN);
               else
-                insPreStmt.setBoolean(i + 1, (Boolean) v);
+                insPreStmt.setBoolean(i + 1, v);
               break;
-            case DATETIME:
-              v = record.getDatetime(i);
+            }
+            case BIGINT:{
+              // XXX: int of r is 32bit,so convert int to double
+              Long v = record.getBigint(i);
               if (v == null)
                 insPreStmt.setNull(i + 1, Types.DOUBLE);
               else
-                insPreStmt.setDouble(i + 1, new Double(((java.util.Date) v).getTime() / 1000));
+                insPreStmt.setDouble(i + 1, v);
               break;
-            case DOUBLE:
-              v = record.getDouble(i);
+            }
+            case INT:{
+              Integer v = record.getInt(i);
               if (v == null)
                 insPreStmt.setNull(i + 1, Types.DOUBLE);
               else
-                insPreStmt.setDouble(i + 1, (Double) v);
+                insPreStmt.setDouble(i + 1, v);
               break;
-            case STRING:
-              v = record.getString(i);
+            }
+            case TINYINT:{
+              Byte v = record.getTinyint(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.DOUBLE);
+              else
+                insPreStmt.setDouble(i + 1, v);
+              break;
+            }
+            case SMALLINT:{
+              Short v = record.getSmallint(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.DOUBLE);
+              else
+                insPreStmt.setDouble(i + 1, v);
+              break;
+            }
+            case DOUBLE:{
+              Double v = record.getDouble(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.DOUBLE);
+              else
+                insPreStmt.setDouble(i + 1, v);
+              break;
+            }
+            case FLOAT: {
+              Float v = record.getFloat(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.DOUBLE);
+              else
+                insPreStmt.setDouble(i + 1, v);
+              break;
+            }
+            case DATETIME: {
+              java.util.Date v = record.getDatetime(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.DOUBLE);
+              else
+                insPreStmt.setDouble(i + 1, v.getTime() / 1000.0);
+              break;
+            }
+            case DATE: {
+              java.sql.Date v = record.getDate(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.DOUBLE);
+              else
+                insPreStmt.setDouble(i + 1, v.getTime() / 1000.0);
+              break;
+            }
+            case TIMESTAMP: {
+              Timestamp v = record.getTimestamp(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.DOUBLE);
+              else
+                insPreStmt.setDouble(i + 1, v.getTime() / 1000.0);
+              break;
+            }
+            case DECIMAL: {
+              BigDecimal v = record.getDecimal(i);
               if (v == null)
                 insPreStmt.setNull(i + 1, Types.NULL);
               else
-                insPreStmt.setString(i + 1, (String) v);
+                insPreStmt.setString(i + 1, v.toPlainString());
               break;
+            }
+            case STRING: {
+              String v = record.getString(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.NULL);
+              else
+                insPreStmt.setString(i + 1, v);
+              break;
+            }
+            case CHAR: {
+              Char v = record.getChar(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.NULL);
+              else
+                insPreStmt.setString(i + 1, v.getValue());
+              break;
+            }
+            case VARCHAR: {
+              Varchar v = record.getVarchar(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.NULL);
+              else
+                insPreStmt.setString(i + 1, v.getValue());
+              break;
+            }
+            case BINARY: {
+              byte[] v = record.getBytes(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.NULL);
+              else
+                insPreStmt.setBytes(i + 1, v);
+              break;
+            }
+            case INTERVAL_YEAR_MONTH: {
+              IntervalYearMonth v = record.getIntervalYearMonth(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.DOUBLE);
+              else
+                insPreStmt.setDouble(i + 1, v.getTotalMonths());
+              break;
+            }
+            case INTERVAL_DAY_TIME: {
+              IntervalDayTime v = record.getIntervalDayTime(i);
+              if (v == null)
+                insPreStmt.setNull(i + 1, Types.DOUBLE);
+              else
+                insPreStmt.setDouble(i + 1, v.getTotalSeconds());
+              break;
+            }
+            case MAP:
+            case STRUCT:
+            case ARRAY:
             default:
-              throw new ROdpsException("Unknown data type!");
+              throw new ROdpsException("Unsupported type " + colType.getTypeName());
           }
         }
 
@@ -169,28 +283,71 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
       rs = stmt.executeQuery(sql);
       long i = 0;
       while (rs.next()) {
-        Record bufRecord = ((UploadSession) (context.getAction())).newRecord();
+        ArrayRecord bufRecord = (ArrayRecord)((UploadSession) (context.getAction())).newRecord();
         for (int j = 0; j < this.context.getSchema().getColumns().size(); j++) {
           boolean isnull = rs.getObject(j + 1) == null;
-          switch (this.context.getSchema().getColumn(j).getType()) {
-            case BIGINT:
-              bufRecord.setBigint(j, isnull ? null : rs.getLong(j + 1));
-              break;
+          TypeInfo colType = this.context.getSchema().getColumn(j).getTypeInfo();
+          switch (colType.getOdpsType()) {
             case BOOLEAN:
               bufRecord.setBoolean(j, isnull ? null : rs.getBoolean(j + 1));
               break;
-            case DATETIME:
-              bufRecord.setDatetime(j, isnull ? null : new java.util.Date(rs.getTimestamp(j + 1)
-                  .getTime() * 1000));
+            case BIGINT:
+              bufRecord.setBigint(j, isnull ? null : rs.getLong(j + 1));
+              break;
+            case INT:
+              bufRecord.setInt(j, isnull ? null : rs.getInt(j + 1));
+              break;
+            case TINYINT:
+              bufRecord.setTinyint(j, isnull ? null : rs.getByte(j + 1));
+              break;
+            case SMALLINT:
+              bufRecord.setSmallint(j, isnull ? null : rs.getShort(j + 1));
               break;
             case DOUBLE:
               bufRecord.setDouble(j, isnull ? null : rs.getDouble(j + 1));
               break;
+            case FLOAT:
+              bufRecord.setFloat(j, isnull ? null : rs.getFloat(j + 1));
+              break;
+            case DATETIME:
+              bufRecord.setDatetime(j, isnull ? null :
+                                       new java.util.Date(rs.getTimestamp(j + 1).getTime() * 1000));
+              break;
+            case DATE:
+              bufRecord.setDate(j, isnull ? null :
+                                   new java.sql.Date(rs.getTimestamp(j + 1).getTime() * 1000));
+              break;
+            case TIMESTAMP:
+              bufRecord.setTimestamp(j, isnull ? null : rs.getTimestamp(j + 1));
+              break;
+            case DECIMAL:
+              bufRecord.setDecimal(j, isnull ? null : rs.getBigDecimal(j + 1));
+              break;
             case STRING:
               bufRecord.setString(j, rs.getString(j + 1));
               break;
+            case CHAR:
+              bufRecord.setChar(j, new Char(rs.getString(j + 1)));
+              break;
+            case VARCHAR:
+              bufRecord.setVarchar(j, new Varchar(rs.getString(j + 1)));
+              break;
+            case BINARY:
+              bufRecord.setBinary(j, new Binary(rs.getBytes(j + 1)));
+              break;
+            case INTERVAL_YEAR_MONTH:
+              bufRecord.setIntervalYearMonth(j, isnull ? null :
+                                                new IntervalYearMonth(rs.getInt(j + 1)));
+              break;
+            case INTERVAL_DAY_TIME:
+              bufRecord.setIntervalDayTime(j, isnull ? null :
+                                              new IntervalDayTime(rs.getLong(j + 1), 0));
+              break;
+            case MAP:
+            case ARRAY:
+            case STRUCT:
             default:
-              throw new ROdpsException("Unknown data type!");
+              throw new ROdpsException("Unsupported type " + colType.getTypeName());
           }
         }
         i++;
@@ -229,21 +386,42 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
     StringBuffer sb = new StringBuffer("create table [" + context.getTable() + "] (");
     for (int i = 0; i < columnNumber; ++i) {
       String colName = "[" + context.getSchema().getColumn(i).getName() + "]";
-      String colType =
-          context.getSchema().getColumn(i).getType().toString().replace("ODPS_", "").toLowerCase();
       sb.append(colName);
       sb.append(" ");
-
-      String type = colType;
-      if (colType.equals("string"))
-        type = "text";
-      else if (colType.equals("bigint") || colType.equals("double") || colType.equals("datetime"))
-        type = "double";
-      else if (colType.equals("boolean"))
-        type = "boolean";
-      else
-        throw new ROdpsException("Unregonized type " + colType);
-
+      TypeInfo colType = context.getSchema().getColumn(i).getTypeInfo();
+      String type;
+      switch (colType.getOdpsType()) {
+        case BOOLEAN:
+          type = "boolean";
+          break;
+        case BIGINT:
+        case INT:
+        case TINYINT:
+        case SMALLINT:
+          type = "integer";
+          break;
+        case DOUBLE:
+        case FLOAT:
+          type = "real";
+          break;
+        case DATETIME:
+        case DATE:
+        case TIMESTAMP:
+        case DECIMAL:
+          type = "numeric";
+          break;
+        case STRING:
+        case CHAR:
+        case VARCHAR:
+        case BINARY:
+          type = "text";
+          break;
+        case MAP:
+        case STRUCT:
+        case ARRAY:
+        default:
+          throw new ROdpsException("Unsupported type " + colType.getTypeName());
+      }
       sb.append(type);
       sb.append(",");
     }

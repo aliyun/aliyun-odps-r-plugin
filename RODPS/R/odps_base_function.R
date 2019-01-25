@@ -431,10 +431,12 @@ rodps.load.table <- rodps.table.read
     }
 
     for (i in 0:(coltype$size()-1)) {
-        if (coltype$get(i) == 'datetime') {
+        if (coltype$get(i) == 'datetime' || coltype$get(i) == 'date' || coltype$get(i) == 'timestamp') {
             data[[i+1]] = as.POSIXct(as.POSIXlt(data[[i+1]], origin="1970-01-01"))
         } else if (coltype$get(i) == 'boolean') {
             data[[i+1]] = as.logical(data[[i+1]])
+        } else if (coltype$get(i) == 'decimal') {
+            data[[i+1]] = as.numeric(data[[i+1]])
         }
     }
     return(data)

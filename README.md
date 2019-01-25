@@ -91,11 +91,32 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 Rscript rodpstest.R
 ```
 
-## Authors && Contributors
+## Type System
 
-- [Xia Mingchao](https://github.com/cobbxia)
-- [Cheng Yichao](https://github.com/onesuper)
-- [Li Ruibo](https://github.com/lyman)
+**All numeric in R have possibility of precision loss.**
+
+| MaxCompute/ODPS | R | Notes |
+|-----------------|---|-------|
+| BOOLEAN | logical | |
+| BIGINT | numeric | |
+| INT | numeric | |
+| TINYINT | numeric | |
+| SMALLINT | numeric | |
+| DOUBLE | numeric | |
+| FLOAT | numeric | |
+| DATETIME | numeric | POSIXct POSIXlt, in second |
+| DATE | numeric | POSIXct POSIXlt, in seconds |
+| TIMESTAMP | numeric | POSIXct POSIXlt, in second |
+| INTERVAL_YEAR_MONTH | numeric | in month |
+| INTERVAL_DATE_TIME | numeric | in second |
+| DECIMAL | numeric | |
+| STRING | character | |
+| CHAR | character | |
+| VARCHAR | character | |
+| BINARY | character | |
+| MAP | - | - |
+| ARRAY | - | - |
+| STRUCT | - | - |
 
 ## License
 
