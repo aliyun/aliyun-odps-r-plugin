@@ -112,8 +112,8 @@ public class RDTDownloader extends DTProcess<DownloadWorker, DownloadSession> {
     for (int i = 0; i < columnNumber; ++i) {
       ret.get(0).add(this.context.getSchema().getColumn(i).getName());
       ret.get(1).add(
-          this.context.getSchema().getColumn(i).getType().toString().replace("ODPS_", "")
-              .toLowerCase());
+          this.context.getSchema().getColumn(i).getTypeInfo().getTypeName()
+              .replace("ODPS_", "").toLowerCase());
     }
     if (keys != null) {
       for (String k : keys) {

@@ -8,4 +8,4 @@ License: Apache License 2.0
 Depends: R (>= 1.8.0), rJava, DBI, RSQLite
 Imports: methods
 URL: http://github.com/aliyun/aliyun-odps-r-plugin
-Packaged: 2019-01-25 19:20:16;  
+Packaged: 2019-01-25 20:18:04;  

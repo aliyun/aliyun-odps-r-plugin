@@ -336,7 +336,7 @@ public class ROdps {
     }
     try {
       tbl.reload();
-      ps.add(createSingleValueFrame("owner", "String", tbl.getOwner()));
+      ps.add(this.createSingleValueFrame("owner", "String", tbl.getOwner()));
       ps.add(this.createSingleValueFrame("project", "String", tbl.getProject()));
       ps.add(this.createSingleValueFrame("comment", "String", tbl.getComment()));
       ps.add(this.createSingleValueFrame("create_time", "DateTime", formatDateTime(tbl.getCreatedTime())));
