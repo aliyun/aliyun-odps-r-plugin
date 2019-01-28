@@ -14,6 +14,9 @@
  */
 package com.aliyun.odps.rodps.DataTunnel;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.aliyun.odps.data.RecordReader;
@@ -62,14 +65,16 @@ public class DownloadWorker implements Runnable {
       if (downloadRecordNumber > 0) {
         reader = context.getAction().openRecordReader(startRecordNumber, downloadRecordNumber);
       }
-      midStorage.saveDtData(reader, downloadRecordNumber);
+      loadedRecordNum = midStorage.saveDtData(reader, downloadRecordNumber);
 
-      LOG.info("threadId=" + this.threadId + " download finished,loadedRecordNum="
+      LOG.info("threadId=" + this.threadId + " download finished, record="
           + this.loadedRecordNum);
       isSuccessful = true;
     } catch (Exception e) {
-      LOG.error("DownloadWorker fail:", e);
-      this.errorMessage = e.getMessage();
+      StringWriter sw = new StringWriter();
+      e.printStackTrace(new PrintWriter(sw));
+      this.errorMessage = sw.toString();
+      LOG.error("download failed, thireadId=" + threadId + ", stack=" + sw.toString());
     } finally {
       midStorage.close();
     }

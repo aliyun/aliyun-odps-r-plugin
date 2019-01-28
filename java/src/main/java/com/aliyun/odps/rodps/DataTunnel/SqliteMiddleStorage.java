@@ -66,7 +66,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
    * @param downloadRecordNumber download record number
    * @throws Exception
    */
-  public void saveDtData(RecordReader reader, long downloadRecordNumber) throws Exception {
+  public long saveDtData(RecordReader reader, long downloadRecordNumber) throws Exception {
     ArrayRecord record;
     long loadedRecordNum = 0;
     int batchSize = 10000;
@@ -77,7 +77,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
     }
     createTable();
     if (downloadRecordNumber == 0)
-      return;
+      return 0L;
 
     // create insert sql
     String insSql = "insert into [" + context.getTable() + "] values(";
@@ -261,6 +261,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
       this.conn.setAutoCommit(false);
       insPreStmt.executeBatch();
       this.conn.commit();
+      return loadedRecordNum;
     } finally {
       if (insPreStmt != null) {
         insPreStmt.close();
@@ -274,7 +275,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
    * @param writer DT writer
    * @throws Exception
    */
-  public void writeToDt(RecordWriter writer) throws Exception {
+  public long writeToDt(RecordWriter writer) throws Exception {
     Statement stmt = null;
     ResultSet rs = null;
     try {
@@ -285,43 +286,44 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
       while (rs.next()) {
         ArrayRecord bufRecord = (ArrayRecord)((UploadSession) (context.getAction())).newRecord();
         for (int j = 0; j < this.context.getSchema().getColumns().size(); j++) {
-          boolean isnull = rs.getObject(j + 1) == null;
+          if (rs.getObject(j + 1) == null) {
+            bufRecord.set(j, null);
+            continue;
+          }
           TypeInfo colType = this.context.getSchema().getColumn(j).getTypeInfo();
           switch (colType.getOdpsType()) {
             case BOOLEAN:
-              bufRecord.setBoolean(j, isnull ? null : rs.getBoolean(j + 1));
+              bufRecord.setBoolean(j, rs.getBoolean(j + 1));
               break;
             case BIGINT:
-              bufRecord.setBigint(j, isnull ? null : rs.getLong(j + 1));
+              bufRecord.setBigint(j, (long)rs.getDouble(j + 1));
               break;
             case INT:
-              bufRecord.setInt(j, isnull ? null : rs.getInt(j + 1));
+              bufRecord.setInt(j, (int)rs.getDouble(j + 1));
               break;
             case TINYINT:
-              bufRecord.setTinyint(j, isnull ? null : rs.getByte(j + 1));
+              bufRecord.setTinyint(j, (byte)rs.getDouble(j + 1));
               break;
             case SMALLINT:
-              bufRecord.setSmallint(j, isnull ? null : rs.getShort(j + 1));
+              bufRecord.setSmallint(j, (short)rs.getShort(j + 1));
               break;
             case DOUBLE:
-              bufRecord.setDouble(j, isnull ? null : rs.getDouble(j + 1));
+              bufRecord.setDouble(j, rs.getDouble(j + 1));
               break;
             case FLOAT:
-              bufRecord.setFloat(j, isnull ? null : rs.getFloat(j + 1));
+              bufRecord.setFloat(j, (float)rs.getDouble(j + 1));
               break;
             case DATETIME:
-              bufRecord.setDatetime(j, isnull ? null :
-                                       new java.util.Date(rs.getTimestamp(j + 1).getTime() * 1000));
+              bufRecord.setDatetime(j, new java.util.Date((long)(rs.getDouble(j + 1) * 1000.0)));
               break;
             case DATE:
-              bufRecord.setDate(j, isnull ? null :
-                                   new java.sql.Date(rs.getTimestamp(j + 1).getTime() * 1000));
+              bufRecord.setDate(j, new java.sql.Date((long)(rs.getDouble(j + 1) * 1000.0)));
               break;
             case TIMESTAMP:
-              bufRecord.setTimestamp(j, isnull ? null : rs.getTimestamp(j + 1));
+              bufRecord.setTimestamp(j, new Timestamp((long)(rs.getDouble(j + 1) * 1000.0)));
               break;
             case DECIMAL:
-              bufRecord.setDecimal(j, isnull ? null : rs.getBigDecimal(j + 1));
+              bufRecord.setDecimal(j, new BigDecimal(rs.getString(j + 1)));
               break;
             case STRING:
               bufRecord.setString(j, rs.getString(j + 1));
@@ -336,12 +338,10 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
               bufRecord.setBinary(j, new Binary(rs.getBytes(j + 1)));
               break;
             case INTERVAL_YEAR_MONTH:
-              bufRecord.setIntervalYearMonth(j, isnull ? null :
-                                                new IntervalYearMonth(rs.getInt(j + 1)));
+              bufRecord.setIntervalYearMonth(j, new IntervalYearMonth((int)rs.getDouble(j + 1)));
               break;
             case INTERVAL_DAY_TIME:
-              bufRecord.setIntervalDayTime(j, isnull ? null :
-                                              new IntervalDayTime(rs.getLong(j + 1), 0));
+              bufRecord.setIntervalDayTime(j, new IntervalDayTime((int)rs.getDouble(j + 1), 0));
               break;
             case MAP:
             case ARRAY:
@@ -353,6 +353,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
         i++;
         writer.write(bufRecord);
       }
+      return i;
     } finally {
       if (rs != null) {
         rs.close();
@@ -398,18 +399,14 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
         case INT:
         case TINYINT:
         case SMALLINT:
-          type = "integer";
-          break;
         case DOUBLE:
         case FLOAT:
-          type = "real";
-          break;
         case DATETIME:
         case DATE:
         case TIMESTAMP:
-        case DECIMAL:
-          type = "numeric";
+          type = "double";
           break;
+        case DECIMAL:
         case STRING:
         case CHAR:
         case VARCHAR:
