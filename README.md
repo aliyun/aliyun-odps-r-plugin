@@ -73,23 +73,15 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 ```
 
 ## Requirements
-- Java 6+
+
+- Java 8+
 - R 1.80+
 
-### Library Dependence
+R libraries
+
 - rJava
 - DBI
 - RSQLite
-
-### Architecture
-
-[![](mindmap-thumb.png)](mindmap.pdf)
-
-### Testing
-
-```
-Rscript rodpstest.R
-```
 
 ## Type System
 
@@ -114,10 +106,20 @@ Rscript rodpstest.R
 | CHAR | character | |
 | VARCHAR | character | |
 | BINARY | character | |
-| MAP | - | - |
-| ARRAY | - | - |
-| STRUCT | - | - |
+| MAP | - | unsupport |
+| ARRAY | - | unsupport |
+| STRUCT | - | unsupport |
+
+## Architecture
+
+[![](mindmap-thumb.png)](mindmap.pdf)
+
+## Testing
+
+```
+Rscript rodpstest.R
+```
 
 ## License
 
-licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
+Licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
