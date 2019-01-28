@@ -8,7 +8,7 @@
     <version>${env.RVERSION}</version>
     <packaging>jar</packaging>
     <name>rodps</name>
-    <url>http://maven.apache.org</url>
+    <url>https://github.com/aliyun/aliyun-odps-r-plugin</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
