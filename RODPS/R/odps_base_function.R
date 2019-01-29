@@ -300,10 +300,7 @@ rodps.table.write <- function(dataframe, full.tablename, partition=NULL, tableco
         return(TRUE)
     }
 
-    op <- options(digits.secs = 6)
-    filename <- paste(as.character(runif(1, min=0, max=as.integer(Sys.time()))), sep=".")
-    filename <- paste(tempdir(), filename, sep= .Platform$file.sep)
-    options(op)
+    filename <- tempfile("rodps", rodpsTmpdir)
 
     actual_thread <- as.integer(thread)
     if (nrow(dataframe) < thread * 100) {
@@ -379,14 +376,11 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
         stop(msg)
     }
 
-    op <- options(digits.secs = 6)
-    filename <- paste(as.character(runif(1, min=0, max=as.integer(Sys.time()))), sep=".")
-    filename <- paste(tempdir(), filename, sep= .Platform$file.sep)
-    options(op)
+    filename <- tempfile("rodps", rodpsTmpdir)
     results <- odpsOperator$loadTableFromDT(projectname, tablename, partition, filename, NULL, NULL, as.integer(limit),as.integer(thread));
 
     if (3 != results$size()) {
-        stop("Internal error with load table from dt, please contact kai.xu")
+        stop("Internal error with load table")
     }
     res <- .sqlite.to.dataframe(results$get(as.integer(2)), results$get(as.integer(1)), tablename, isdebug)
     if ("windows" == .Platform$OS.type) {

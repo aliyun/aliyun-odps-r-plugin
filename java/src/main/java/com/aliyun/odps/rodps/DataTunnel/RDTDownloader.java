@@ -79,7 +79,7 @@ public class RDTDownloader extends DTProcess<DownloadWorker, DownloadSession> {
       }
       ret.add(getFiles(tempDataFile, workers.size()));
     } catch (Exception e) {
-      throw new IOException("down load table met InterruptedException", e);
+      throw new IOException("download table failed: ", e);
     }
     return ret;
   }

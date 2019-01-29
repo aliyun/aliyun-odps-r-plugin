@@ -74,7 +74,7 @@ public class DownloadWorker implements Runnable {
       StringWriter sw = new StringWriter();
       e.printStackTrace(new PrintWriter(sw));
       this.errorMessage = sw.toString();
-      LOG.error("download failed, thireadId=" + threadId + ", stack=" + sw.toString());
+      LOG.error("download failed, threadId=" + threadId + ", stack=" + sw.toString());
     } finally {
       midStorage.close();
     }
