@@ -10,6 +10,16 @@
 - The large data set can be processed by using the distributed algorithm.
 - The small data set can be processed directly in R.
 
+## Requirements
+
+- Java 8+
+- R 1.80+
+
+R libraries
+
+- rJava
+- DBI
+- RSQLite
 
 ## Installation
 
@@ -51,7 +61,6 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 
 ## Getting Started
 
-
 ```R
 > library("RODPS")  # Load RODPS
 >
@@ -72,17 +81,6 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 > rodps.predict.rpart(fit, srctbl='iris',tgttbl='iris_p') # modeling
 ```
 
-## Requirements
-
-- Java 8+
-- R 1.80+
-
-R libraries
-
-- rJava
-- DBI
-- RSQLite
-
 ## Type System
 
 **All numeric in R have possibility of precision loss.**
@@ -90,7 +88,7 @@ R libraries
 | MaxCompute/ODPS | R | Notes |
 |-----------------|---|-------|
 | BOOLEAN | logical | |
-| BIGINT | numeric | |
+| BIGINT | numeric | \[-9223372036854774784, 9223372036854774784\] * |
 | INT | numeric | |
 | TINYINT | numeric | |
 | SMALLINT | numeric | |
@@ -110,15 +108,11 @@ R libraries
 | ARRAY | - | unsupport |
 | STRUCT | - | unsupport |
 
+* BIGINT(64bit) from MaxCompute is stored and calculated as double(64bit) in RODPS. Precision loss might happen when casting BIGINT to double, which shrinks the min/max value could be written back to MaxCompute/ODPS.
+
 ## Architecture
 
 [![](mindmap-thumb.png)](mindmap.pdf)
-
-## Testing
-
-```
-Rscript rodpstest.R
-```
 
 ## License
 
