@@ -9,3 +9,8 @@ target/
 RODPS.Rcheck/
 *.ini
 *~
+build/
+.R*
+rodps.log
+rodps.log.*
+*.versionsBackup

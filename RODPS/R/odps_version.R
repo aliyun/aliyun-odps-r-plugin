@@ -1,5 +1,5 @@
 rodps.version <- function()
 {
-    print("RODPS 1.3.4")
-    print("BUILDDATE 2019-01-18 19:13:13")
+    print("RODPS 2.0")
+    print("BUILDDATE 2019-01-29 19:44:44")
 }

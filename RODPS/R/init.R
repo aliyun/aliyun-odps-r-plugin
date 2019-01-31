@@ -2,12 +2,16 @@
 .onLoad <- function(libname, pkgname)
 {
     init.java.env(libname, pkgname)
+    rodpsTmpdir<<-tempdir()
     maxRecord<<-10000
     errormsg<<-load.errormsg()
     conf<-rodps.loadconf()
     odpsOperator<<-NULL
     if(!is.null(conf)){
         .init_odps_operator(conf)
+    }
+    if(!is.na(conf["rodps_tmpdir"])) {
+        rodpsTmpdir <<- conf["rodps_tmpdir"]
     }
 }
 rodps.init <- function(path=NULL, access.id=NULL, access.key=NULL){
@@ -21,8 +25,14 @@ rodps.init <- function(path=NULL, access.id=NULL, access.key=NULL){
     if(!is.null(conf)){
         .init_odps_operator(conf)
     }
+    if(!is.na(conf["rodps_tmpdir"])) {
+        rodpsTmpdir <<- conf["rodps_tmpdir"]
+    }
 }
 
+rodps.tmpdir <- function(path) {
+    rodpsTmpdir <<- path
+}
 
 .init_odps_operator <- function(conf){
     if (!is.na(conf["tunnel_endpoint"])) {
@@ -78,20 +88,27 @@ init.dtsdk.env <- function(libname, pkgname)
 }
 
 rodps.loadconf <- function(path=NULL){
-    if(is.null(path)){
+    if (is.null(path) || path=="" || !file.exists(path)) {
         path <- Sys.getenv("RODPS_CONFIG")
+        print("checking RODPS_CONFIG ...")
     }
-	if(is.null(path)){
+	if (is.null(path) || path=="" || !file.exists(path)) {
 		path <- Sys.getenv("ODPS_CONFIG")
+        print("checking ODPS_CONFIG ...")
 	}
-    if(path == ''){
+    if (is.null(path) || path=="" || !file.exists(path)) {
         path <- paste(Sys.getenv('HOME'),.Platform$file.sep, "odps_config.ini", sep="")
+        print(paste("checking", path, "..."))
     }
-    if (is.null(path) || path=="" || !file.exists(path))
-    {
-        print("RODPS_CONFIG system variable is not set or the configuration file does not exist, you need to manually init (path)\n,set environment variable or in R workplace")
+    if (is.null(path) || path=="" || !file.exists(path)) {
+        path <- paste(Sys.getenv('HOME'), .Platform$file.sep, ".odpscmd", .Platform$file.sep, "odps_config.ini", sep="")
+        print(paste("checking", path, "..."))
+    }
+    if (is.null(path) || path=="" || !file.exists(path)) {
+        print("RODPS_CONFIG environment variable is not set or the configuration file does not exist,\nplease manually invoke rodps.init(path) or set environment variable")
 		return(NULL)
     }
+    print(paste("using config file", path))
     conf <- read.table(path,stringsAsFactors=FALSE)
     keys<-c()
     values<-c()

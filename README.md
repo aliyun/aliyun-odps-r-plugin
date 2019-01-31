@@ -10,6 +10,16 @@
 - The large data set can be processed by using the distributed algorithm.
 - The small data set can be processed directly in R.
 
+## Requirements
+
+- Java 8+
+- R 1.80+
+
+R libraries
+
+- rJava
+- DBI
+- RSQLite
 
 ## Installation
 
@@ -51,7 +61,6 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 
 ## Getting Started
 
-
 ```R
 > library("RODPS")  # Load RODPS
 >
@@ -72,31 +81,39 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 > rodps.predict.rpart(fit, srctbl='iris',tgttbl='iris_p') # modeling
 ```
 
-## Requirements
-- Java 6+
-- R 1.80+
+## Type System
 
-### Library Dependence
-- rJava
-- DBI
-- RSQLite
+**All numeric in R have possibility of precision loss.**
 
-### Architecture
+| MaxCompute/ODPS | R | Notes |
+|-----------------|---|-------|
+| BOOLEAN | logical | |
+| BIGINT | numeric | \[-9223372036854774784, 9223372036854774784\] * |
+| INT | numeric | |
+| TINYINT | numeric | |
+| SMALLINT | numeric | |
+| DOUBLE | numeric | |
+| FLOAT | numeric | |
+| DATETIME | numeric | POSIXct POSIXlt, in second |
+| DATE | numeric | POSIXct POSIXlt, in seconds |
+| TIMESTAMP | numeric | POSIXct POSIXlt, in second |
+| INTERVAL_YEAR_MONTH | numeric | in month |
+| INTERVAL_DATE_TIME | numeric | in second |
+| DECIMAL | numeric | |
+| STRING | character | |
+| CHAR | character | |
+| VARCHAR | character | |
+| BINARY | character | |
+| MAP | - | unsupport |
+| ARRAY | - | unsupport |
+| STRUCT | - | unsupport |
+
+* BIGINT(64bit) from MaxCompute is stored and calculated as double(64bit) in RODPS. Precision loss might happen when casting BIGINT to double, which shrinks the min/max value could be written back to MaxCompute/ODPS.
+
+## Architecture
 
 [![](mindmap-thumb.png)](mindmap.pdf)
 
-### Testing
-
-```
-Rscript rodpstest.R
-```
-
-## Authors && Contributors
-
-- [Xia Mingchao](https://github.com/cobbxia)
-- [Cheng Yichao](https://github.com/onesuper)
-- [Li Ruibo](https://github.com/lyman)
-
 ## License
 
-licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
+Licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)

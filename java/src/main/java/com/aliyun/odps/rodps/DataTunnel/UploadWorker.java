@@ -15,6 +15,8 @@
 package com.aliyun.odps.rodps.DataTunnel;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,18 +57,20 @@ public class UploadWorker implements Runnable {
 
   public void run() {
     LOG.info("Start to upload threadId=" + this.threadId);
-    long blockID = Long.valueOf(threadId);
+    long blockID = (long) threadId;
     try {
       writer = context.getAction().openRecordWriter(blockID);
-      midStorage.writeToDt(writer);
+      long cnt = midStorage.writeToDt(writer);
       if (this.writer != null) {
         this.writer.close();
       }
       isSuccessful = true;
-      LOG.info("upload finish threadId=" + threadId);
+      LOG.info("upload finish threadId=" + threadId + ", record=" + cnt);
     } catch (Exception e) {
-      LOG.error(e);
-      this.errorMessage = e.getMessage();
+      StringWriter sw = new StringWriter();
+      e.printStackTrace(new PrintWriter(sw));
+      this.errorMessage = sw.toString();
+      LOG.error("upload failed, threadId=" + threadId + ", stack=" + sw.toString());
     } finally {
       midStorage.close();
     }
