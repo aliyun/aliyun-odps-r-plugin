@@ -36,7 +36,7 @@ rodps.tmpdir <- function(path) {
         tunnel_endpoint <- conf["dt_end_point"]
     } else {
         tunnel_endpoint <- "NA"
-        print("WARN: tunnel_endpoint not set, auto-routed tunnel endpoint might not work")
+        writeLines("WARN: tunnel_endpoint not set, auto-routed tunnel endpoint might not work")
     }
     # init tmp dir
     if(!is.na(conf["rodps_tmpdir"])) {
@@ -90,25 +90,25 @@ init.dtsdk.env <- function(libname, pkgname)
 rodps.loadconf <- function(path=NULL){
     if (is.null(path) || path=="" || !file.exists(path)) {
         path <- Sys.getenv("RODPS_CONFIG")
-        print("checking RODPS_CONFIG ...")
+        writeLines("checking RODPS_CONFIG ...")
     }
 	if (is.null(path) || path=="" || !file.exists(path)) {
 		path <- Sys.getenv("ODPS_CONFIG")
-        print("checking ODPS_CONFIG ...")
+        writeLines("checking ODPS_CONFIG ...")
 	}
     if (is.null(path) || path=="" || !file.exists(path)) {
         path <- paste(Sys.getenv('HOME'),.Platform$file.sep, "odps_config.ini", sep="")
-        print(paste("checking", path, "..."))
+        writeLines(paste("checking", path, "..."))
     }
     if (is.null(path) || path=="" || !file.exists(path)) {
         path <- paste(Sys.getenv('HOME'), .Platform$file.sep, ".odpscmd", .Platform$file.sep, "odps_config.ini", sep="")
-        print(paste("checking", path, "..."))
+        writeLines(paste("checking", path, "..."))
     }
     if (is.null(path) || path=="" || !file.exists(path)) {
-        print("RODPS_CONFIG environment variable is not set or the configuration file does not exist,\nplease manually invoke rodps.init(path) or set environment variable")
+        writeLines("RODPS_CONFIG environment variable is not set or the configuration file does not exist.\n- rodps.init(path) to manually init RODPS\n- add RODPS_CONFIG as environment variable")
 		return(NULL)
     }
-    print(paste("using config file", path))
+    writeLines(paste("using config file", path))
     conf <- read.table(path,stringsAsFactors=FALSE)
     keys<-c()
     values<-c()

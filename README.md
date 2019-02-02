@@ -95,7 +95,7 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 | DOUBLE | numeric | |
 | FLOAT | numeric | |
 | DATETIME | numeric | POSIXct POSIXlt, in second |
-| DATE | numeric | POSIXct POSIXlt, in seconds |
+| DATE | numeric | POSIXct POSIXlt, in second |
 | TIMESTAMP | numeric | POSIXct POSIXlt, in second |
 | INTERVAL_YEAR_MONTH | numeric | in month |
 | INTERVAL_DATE_TIME | numeric | in second |
