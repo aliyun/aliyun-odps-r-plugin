@@ -10,9 +10,6 @@
     if(!is.null(conf)){
         .init_odps_operator(conf)
     }
-    if(!is.na(conf["rodps_tmpdir"])) {
-        rodpsTmpdir <<- conf["rodps_tmpdir"]
-    }
 }
 rodps.init <- function(path=NULL, access.id=NULL, access.key=NULL){
     conf<-rodps.loadconf(path)
@@ -25,9 +22,6 @@ rodps.init <- function(path=NULL, access.id=NULL, access.key=NULL){
     if(!is.null(conf)){
         .init_odps_operator(conf)
     }
-    if(!is.na(conf["rodps_tmpdir"])) {
-        rodpsTmpdir <<- conf["rodps_tmpdir"]
-    }
 }
 
 rodps.tmpdir <- function(path) {
@@ -35,6 +29,7 @@ rodps.tmpdir <- function(path) {
 }
 
 .init_odps_operator <- function(conf){
+    # tunnel endpoint should be explicitly specified
     if (!is.na(conf["tunnel_endpoint"])) {
         tunnel_endpoint <- conf["tunnel_endpoint"]
     } else if (!is.na(conf["dt_end_point"])) {
@@ -43,6 +38,11 @@ rodps.tmpdir <- function(path) {
         tunnel_endpoint <- "NA"
         print("WARN: tunnel_endpoint not set, auto-routed tunnel endpoint might not work")
     }
+    # init tmp dir
+    if(!is.na(conf["rodps_tmpdir"])) {
+        rodpsTmpdir <<- conf["rodps_tmpdir"]
+    }
+    # java odps object
     odpsOperator <<- .jnew("com/aliyun/odps/rodps/ROdps", conf["project_name"],
                                                           conf["access_id"],
                                                           conf["access_key"],
