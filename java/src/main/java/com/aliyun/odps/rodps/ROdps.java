@@ -55,7 +55,6 @@ import com.aliyun.odps.rodps.DataTunnel.ROdpsException;
 import com.aliyun.odps.task.SQLTask;
 import com.aliyun.odps.tunnel.TableTunnel.DownloadSession;
 import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
-import com.aliyun.odps.utils.StringUtils;
 
 public class ROdps {
 
@@ -515,19 +514,7 @@ public class ROdps {
     LOG.debug("sql: " + sql);
 
     try {
-      SQLTask sqlTask = new SQLTask();
-      sqlTask.setName("rodps_sql_task");
-      sqlTask.setQuery(sql);
-      if (!StringUtils.isNullOrEmpty(this.bizId)) {
-        sqlTask.setProperty("biz_id", this.bizId);
-        LOG.debug("biz_id: " + this.bizId);
-      }
-      if (!settings.isEmpty()) {
-        for (Object k : settings.keySet()) {
-          sqlTask.setProperty((String)k, (String)(settings.get(k)));
-        }
-      }
-      Instance instance = odps.instances().create(sqlTask);
+      Instance instance = SQLTask.run(odps, odps.getDefaultProject(), sql, "rodps_sql_task", settings, null);
       LogView logView = new LogView(odps);
       if (LOGVIEW_HOST != null) {
         logView.setLogViewHost(LOGVIEW_HOST);
