@@ -1,5 +1,5 @@
 Package: RODPS
-Version: 2.0
+Version: 2.0.1
 Title: R interface to interact with MaxCompute/ODPS
 Description: This package is developed for R to interact with MaxCompute/ODPS,
  which is the platform of Alibaba to process big data.
@@ -8,4 +8,4 @@ License: Apache License 2.0
 Depends: R (>= 1.8.0), rJava, DBI, RSQLite
 Imports: methods
 URL: http://github.com/aliyun/aliyun-odps-r-plugin
-Packaged: 2019-01-29 19:44:44;
+Packaged: 2019-04-02 20:30:04;
