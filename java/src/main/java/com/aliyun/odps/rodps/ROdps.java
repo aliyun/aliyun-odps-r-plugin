@@ -190,6 +190,7 @@ public class ROdps {
         if (++retryTimes <= RETRY_MAX) {
           LOG.error("load table encounter exception:" + e.getMessage() + ", retry times = "
               + retryTimes);
+          e.printStackTrace();
           try {
             Thread.sleep(5000);
           } catch (InterruptedException e1) {

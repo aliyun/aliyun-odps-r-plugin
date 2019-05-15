@@ -12,6 +12,10 @@
     }
 }
 rodps.init <- function(path=NULL, access.id=NULL, access.key=NULL){
+    # in case of isolating global variable by using rm(list=ls(all=TRUE)) + rodps.init
+    rodpsTmpdir<<-tempdir()
+    maxRecord<<-10000
+    errormsg<<-load.errormsg()
     conf<-rodps.loadconf(path)
     if(!is.null(access.id)){
         conf["access_id"] <- access.id;
@@ -19,6 +23,7 @@ rodps.init <- function(path=NULL, access.id=NULL, access.key=NULL){
     if(!is.null(access.key)){
         conf["access_key"] <- access.key;
     }
+    odpsOperator<<-NULL
     if(!is.null(conf)){
         .init_odps_operator(conf)
     }
