@@ -12,8 +12,8 @@
 
 ## Requirements
 
-- Java 8+
-- R 1.80+
+- Java: Recommend Java 8 (Java 9 or higher might encounter JAXB issue)
+- R: latest release (RODPS itself support R 1.8+, its dependency libraries does not)
 
 R libraries
 
