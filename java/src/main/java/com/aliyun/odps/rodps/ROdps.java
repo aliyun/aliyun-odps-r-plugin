@@ -13,7 +13,6 @@
  * the License.
  */
 
-
 package com.aliyun.odps.rodps;
 
 import java.io.BufferedReader;
@@ -65,7 +64,6 @@ public class ROdps {
   private final static int RETRY_MAX = 3;
   private final static String PROG_VERSION = "rodps-1.3";
   private String LOGVIEW_HOST;
-  private String bizId = null;
   private HashMap settings;
 
 
@@ -113,7 +111,7 @@ public class ROdps {
   }
 
   public void setBizId(String s) {
-    this.bizId = s;
+    set("biz_id", s);
   }
 
   public void set(String key, String value) {
