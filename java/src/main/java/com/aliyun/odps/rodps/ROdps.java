@@ -46,6 +46,7 @@ import com.aliyun.odps.Project;
 import com.aliyun.odps.Table;
 import com.aliyun.odps.TableFilter;
 import com.aliyun.odps.account.AliyunAccount;
+import com.aliyun.odps.account.StsAccount;
 import com.aliyun.odps.rodps.DataTunnel.Context;
 import com.aliyun.odps.rodps.DataTunnel.DataFrameItem;
 import com.aliyun.odps.rodps.DataTunnel.RDTDownloader;
@@ -66,8 +67,13 @@ public class ROdps {
   private String LOGVIEW_HOST;
   private HashMap settings;
 
-
   public ROdps(String projectName, String accessID, String accessKey, String endPoint,
+      String dtEndpoint, String logviewHost, String log4j_properties) throws ROdpsException,
+      OdpsException {
+     this(projectName, accessID, accessKey, "", endPoint, dtEndpoint, logviewHost, log4j_properties);
+  }
+
+  public ROdps(String projectName, String accessID, String accessKey, String stsToken, String endPoint,
       String dtEndpoint, String logviewHost, String log4j_properties) throws ROdpsException,
       OdpsException {
 
@@ -97,7 +103,12 @@ public class ROdps {
 
     ODPS_PROJECT_NAME = projectName;
     LOGVIEW_HOST = logviewHost;
-    odps = new Odps(new AliyunAccount(accessID, accessKey));
+
+    if (stsToken == null || stsToken.length() <= 0) {
+        odps = new Odps(new AliyunAccount(accessID, accessKey));
+    } else {
+        odps = new Odps(new StsAccount(accessID, accessKey, stsToken.trim()));
+    }
     odps.setEndpoint(endPoint);
     odps.setDefaultProject(projectName);
     odps.setUserAgent(PROG_VERSION);
