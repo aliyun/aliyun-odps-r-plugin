@@ -3,4 +3,5 @@ access_key=
 end_point=
 tunnel_endpoint=
 project_name=
-rodps_tmpdir=
+# sts_token=
+# rodps_tmpdir=
