@@ -51,6 +51,7 @@ rodps.tmpdir <- function(path) {
     odpsOperator <<- .jnew("com/aliyun/odps/rodps/ROdps", conf["project_name"],
                                                           conf["access_id"],
                                                           conf["access_key"],
+                                                          conf["sts_token"],
                                                           conf["end_point"],
                                                           tunnel_endpoint,
                                                           conf["logview_host"],
