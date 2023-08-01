@@ -18,6 +18,7 @@ package com.aliyun.odps.rodps;
 import java.io.BufferedReader;
 import java.io.CharArrayWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,7 +33,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,7 +82,12 @@ public class ROdps {
     if (log4j_properties == null||log4j_properties.isEmpty())
       LOG = LogFactory.getLog(ROdps.class);
     else {
-      PropertyConfigurator.configure(log4j_properties);
+      try {
+        ConfigurationSource source = new ConfigurationSource(new FileInputStream(log4j_properties));
+        Configurator.initialize(null, source);
+      } catch (IOException e) {
+        throw new ROdpsException("Invalid log4j property file");
+      }
       LOG = LogFactory.getLog(ROdps.class);
     }
     LOG.info("Init Odps");
@@ -538,7 +545,8 @@ public class ROdps {
       if (result == null||result.isEmpty()) {
         return new ArrayList<String>();
       }
-      return Arrays.asList(results.get("rodps_sql_task").split("\n"));
+      return new ArrayList<String>(
+        Arrays.asList(results.get("rodps_sql_task").split("\n")));
     }
 
     catch (Exception e) {

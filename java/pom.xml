@@ -5,7 +5,7 @@
 
     <groupId>com.aliyun.odps</groupId>
     <artifactId>rodps</artifactId>
-    <version>2.1.1</version>
+    <version>2.1.2</version>
     <packaging>jar</packaging>
     <name>rodps</name>
     <url>https://github.com/aliyun/aliyun-odps-r-plugin</url>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.34.0</version>
+            <version>3.42.0.0</version>
         </dependency>
 
         <dependency>
@@ -42,9 +42,9 @@
         </dependency>
 
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.4</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.20.0</version>
         </dependency>
     </dependencies>
 
