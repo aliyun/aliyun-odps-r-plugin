@@ -538,7 +538,8 @@ public class ROdps {
       if (result == null||result.isEmpty()) {
         return new ArrayList<String>();
       }
-      return Arrays.asList(results.get("rodps_sql_task").split("\n"));
+      return new ArrayList<String>(
+        Arrays.asList(results.get("rodps_sql_task").split("\n")));
     }
 
     catch (Exception e) {
