@@ -43,7 +43,7 @@ install.packages('devtools')
 3.Install RODPS package:
 
 ```
-install.packages('https://github.com/aliyun/aliyun-odps-r-plugin/releases/download/v2.1.1/RODPS_2.1.1.tar.gz', type="source", repos=NULL)
+install.packages('https://github.com/aliyun/aliyun-odps-r-plugin/releases/download/v2.1.2/RODPS_2.1.2.tar.gz', type="source", repos=NULL)
 ```
 
 4.Please make sure the environment variable `RODPS_CONFIG` is set to `path/to/odps_config.ini`
