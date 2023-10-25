@@ -55,7 +55,7 @@ public class RDTUploader extends DTProcess<UploadWorker, UploadSession> {
       throw new ROdpsException(e.getErrorCode() + e.getErrorMsg());
     }
 
-    LOG.info("Upload session ID: " + uploadSession.getId());
+    LOG.info("upload session ID: " + uploadSession.getId());
 
     List<UploadWorker> workers = this.createWorkerList(dataFilePath);
     try {
@@ -75,7 +75,7 @@ public class RDTUploader extends DTProcess<UploadWorker, UploadSession> {
       if (!errorMessage.isEmpty()) {
         throw new IOException(errorMessage);
       }
-
+      LOG.info("commit success");
     } catch (InterruptedException e) {
       throw new ROdpsException(e);
 

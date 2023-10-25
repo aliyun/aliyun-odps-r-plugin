@@ -300,7 +300,8 @@ rodps.table.write <- function(dataframe, full.tablename, partition=NULL, tableco
         return(TRUE)
     }
 
-    filename <- tempfile("rodps", rodpsTmpdir)
+    tempprefix <- paste("rodps", ceiling(runif(1,1,1000000)), '_', sep='')
+    filename <- tempfile(tempprefix, rodpsTmpdir)
 
     actual_thread <- as.integer(thread)
     if (nrow(dataframe) < thread * 100) {
@@ -376,7 +377,9 @@ rodps.table.read <- function(full.tablename, partition=NULL, limit = -1,memsize 
         stop(msg)
     }
 
-    filename <- tempfile("rodps", rodpsTmpdir)
+    tempprefix <- paste("rodps", ceiling(runif(1,1,100000)), '_', sep='')
+    filename <- tempfile(tempprefix, rodpsTmpdir)
+
     results <- odpsOperator$loadTableFromDT(projectname, tablename, partition, filename, NULL, NULL, as.integer(limit),as.integer(thread));
 
     if (3 != results$size()) {

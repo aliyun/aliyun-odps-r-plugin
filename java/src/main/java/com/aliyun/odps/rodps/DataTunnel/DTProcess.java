@@ -61,6 +61,7 @@ public abstract class DTProcess<T, C> {
       long downloadRecordNumber, String fileName) throws ROdpsException;
 
   protected static String createTempFileName(String fileName, int index) {
+    // Should keep consistent with function `.dataframe.to.sqlite()`
     return fileName + "_" + index;
   }
 
