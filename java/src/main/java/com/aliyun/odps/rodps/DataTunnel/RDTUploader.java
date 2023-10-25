@@ -35,7 +35,7 @@ public class RDTUploader extends DTProcess<UploadWorker, UploadSession> {
     super(context);
   }
 
-  public void upload(String savePath) throws ROdpsException, IOException {
+  public void upload(String dataFilePath) throws ROdpsException, IOException {
     TableTunnel tunnel = new TableTunnel(context.getOdps());
     if (context.getDtEndpoint() != null) {
       tunnel.setEndpoint(context.getDtEndpoint());
@@ -55,7 +55,9 @@ public class RDTUploader extends DTProcess<UploadWorker, UploadSession> {
       throw new ROdpsException(e.getErrorCode() + e.getErrorMsg());
     }
 
-    List<UploadWorker> workers = this.createWorkerList(savePath);
+    LOG.info("Upload session ID: " + uploadSession.getId());
+
+    List<UploadWorker> workers = this.createWorkerList(dataFilePath);
     try {
       String errorMessage = "";
       LOG.info("wait for upload end");
@@ -84,7 +86,7 @@ public class RDTUploader extends DTProcess<UploadWorker, UploadSession> {
 
   @Override
   public UploadWorker createWorker(int threadId, Context<UploadSession> context,
-      long startRecordNumber, long downloadRecordNumber, String savePath) throws ROdpsException {
-    return new UploadWorker(threadId, context, savePath);
+      long startRecordNumber, long downloadRecordNumber, String fileName) throws ROdpsException {
+    return new UploadWorker(threadId, context, fileName);
   }
 }

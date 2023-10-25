@@ -36,10 +36,10 @@ public abstract class DTProcess<T, C> {
     this.context = context;
   }
 
-  public List<T> createWorkerList(String savePath) throws ROdpsException {
-    LOG.info("start to create download worker");
-
+  public List<T> createWorkerList(String fileName) throws ROdpsException {
     int threadNum = context.getActualThreads();
+
+    LOG.info(String.format("start to create %d processing workers", threadNum));
 
     long recordNumPerThread = this.context.getDownloadRecords() / threadNum;
     LOG.info("record number per thread:" + String.valueOf(recordNumPerThread));
@@ -50,18 +50,18 @@ public abstract class DTProcess<T, C> {
           (i == threadNum - 1 ? (this.context.getDownloadRecords() - i * recordNumPerThread)
               : recordNumPerThread);
       worker =
-          createWorker(i, context, i * recordNumPerThread, records, createTempFileName(savePath, i));
+          createWorker(i, context, i * recordNumPerThread, records, createTempFileName(fileName, i));
       workers.add(worker);
     }
-    LOG.info("end to create download worker");
+    LOG.info("finish creating processing workers");
     return workers;
   }
 
   public abstract T createWorker(int threadId, Context<C> context, long startRecordNumber,
-      long downloadRecordNumber, String savePath) throws ROdpsException;
+      long downloadRecordNumber, String fileName) throws ROdpsException;
 
-  protected static String createTempFileName(String savePath, int index) {
-    return savePath + "_" + index;
+  protected static String createTempFileName(String fileName, int index) {
+    return fileName + "_" + index;
   }
 
 }

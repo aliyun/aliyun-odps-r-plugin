@@ -140,7 +140,7 @@ public class ROdps {
     settings.remove(key);
   }
 
-  // use tunnel sdk to download table
+  // use tunnel sdk to upload table
   public void writeTableFromDT(String projectName, String tableName, String partition,
       String dataFilePathName, String columnDelimiter, String rowDelimiter, long recordCount,
       int threadNumber) throws ROdpsException {
