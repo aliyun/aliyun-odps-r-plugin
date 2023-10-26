@@ -65,7 +65,7 @@ public class DownloadWorker implements Runnable {
       if (downloadRecordNumber > 0) {
         reader = context.getAction().openRecordReader(startRecordNumber, downloadRecordNumber);
       }
-      loadedRecordNum = midStorage.saveDtData(reader, downloadRecordNumber);
+      loadedRecordNum = midStorage.readDataTunnel(reader, downloadRecordNumber);
 
       LOG.info("threadId=" + this.threadId + " download finished, record="
           + this.loadedRecordNum);

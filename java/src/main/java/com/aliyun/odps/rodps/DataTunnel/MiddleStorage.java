@@ -18,9 +18,9 @@ import com.aliyun.odps.data.RecordReader;
 import com.aliyun.odps.data.RecordWriter;
 
 public interface MiddleStorage {
-  long saveDtData(RecordReader reader, long downloadRecordNumber) throws Exception;
+  long readDataTunnel(RecordReader reader, long downloadRecordNumber) throws Exception;
 
-  long writeToDt(RecordWriter writer) throws Exception;
+  long writeDataTunnel(RecordWriter writer) throws Exception;
 
   void close();
 }

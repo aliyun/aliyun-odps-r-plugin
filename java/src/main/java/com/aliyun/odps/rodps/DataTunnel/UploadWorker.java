@@ -44,6 +44,7 @@ public class UploadWorker implements Runnable {
   private RecordWriter writer;
   private long uploaded;
   private MiddleStorage midStorage;
+  private int maxRetries = 3;
 
   public UploadWorker(int threadId, Context<UploadSession> context, String fileName)
       throws ROdpsException {
@@ -58,21 +59,31 @@ public class UploadWorker implements Runnable {
   public void run() {
     LOG.info("Start to upload threadId=" + this.threadId);
     long blockID = (long) threadId;
-    try {
-      writer = context.getAction().openRecordWriter(blockID);
-      long cnt = midStorage.writeToDt(writer);
-      if (this.writer != null) {
-        this.writer.close();
+    int retries = 1;
+    while (retries <= maxRetries && !isSuccessful) {
+      try {
+        // The last opened writer would be valid only
+        writer = context.getAction().openRecordWriter(blockID);
+        long cnt = midStorage.writeDataTunnel(writer);
+        if (this.writer != null) {
+          this.writer.close(); // Occasional timeout due to server flunctation
+        }
+        isSuccessful = true;
+        LOG.info("upload finish threadId=" + threadId + ", record=" + cnt);
+      } catch (Exception e) {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        this.errorMessage = sw.toString();
+        if (retries <= maxRetries) {
+          LOG.warn("upload failed in attempt " + retries + ", threadId=" + threadId + ", stack=" + sw.toString());
+        } else {
+          LOG.error("upload failed finally, threadId=" + threadId + ", stack=" + sw.toString());
+        }
       }
-      isSuccessful = true;
-      LOG.info("upload finish threadId=" + threadId + ", record=" + cnt);
-    } catch (Exception e) {
-      StringWriter sw = new StringWriter();
-      e.printStackTrace(new PrintWriter(sw));
-      this.errorMessage = sw.toString();
-      LOG.error("upload failed, threadId=" + threadId + ", stack=" + sw.toString());
-    } finally {
-      midStorage.close();
+      retries++;
+    }
+    if (this.midStorage != null) {
+      this.midStorage.close();
     }
   }
 

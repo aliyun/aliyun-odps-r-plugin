@@ -62,11 +62,11 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
   /**
    * Read odps data using DT, and persist these data into sqlite
    * 
-   * @param reader DT reader
+   * @param reader               DT reader
    * @param downloadRecordNumber download record number
    * @throws Exception
    */
-  public long saveDtData(RecordReader reader, long downloadRecordNumber) throws Exception {
+  public long readDataTunnel(RecordReader reader, long downloadRecordNumber) throws Exception {
     ArrayRecord record;
     long loadedRecordNum = 0;
     int batchSize = 10000;
@@ -104,7 +104,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
                 insPreStmt.setBoolean(i + 1, v);
               break;
             }
-            case BIGINT:{
+            case BIGINT: {
               // XXX: int of r is 32bit,so convert int to double
               Long v = record.getBigint(i);
               if (v == null)
@@ -113,7 +113,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
                 insPreStmt.setDouble(i + 1, v);
               break;
             }
-            case INT:{
+            case INT: {
               Integer v = record.getInt(i);
               if (v == null)
                 insPreStmt.setNull(i + 1, Types.DOUBLE);
@@ -121,7 +121,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
                 insPreStmt.setDouble(i + 1, v);
               break;
             }
-            case TINYINT:{
+            case TINYINT: {
               Byte v = record.getTinyint(i);
               if (v == null)
                 insPreStmt.setNull(i + 1, Types.DOUBLE);
@@ -129,7 +129,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
                 insPreStmt.setDouble(i + 1, v);
               break;
             }
-            case SMALLINT:{
+            case SMALLINT: {
               Short v = record.getSmallint(i);
               if (v == null)
                 insPreStmt.setNull(i + 1, Types.DOUBLE);
@@ -137,7 +137,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
                 insPreStmt.setDouble(i + 1, v);
               break;
             }
-            case DOUBLE:{
+            case DOUBLE: {
               Double v = record.getDouble(i);
               if (v == null)
                 insPreStmt.setNull(i + 1, Types.DOUBLE);
@@ -275,7 +275,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
    * @param writer DT writer
    * @throws Exception
    */
-  public long writeToDt(RecordWriter writer) throws Exception {
+  public long writeDataTunnel(RecordWriter writer) throws Exception {
     Statement stmt = null;
     ResultSet rs = null;
     try {
@@ -284,7 +284,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
       rs = stmt.executeQuery(sql);
       long i = 0;
       while (rs.next()) {
-        ArrayRecord bufRecord = (ArrayRecord)((UploadSession) (context.getAction())).newRecord();
+        ArrayRecord bufRecord = (ArrayRecord) ((UploadSession) (context.getAction())).newRecord();
         for (int j = 0; j < this.context.getSchema().getColumns().size(); j++) {
           if (rs.getObject(j + 1) == null) {
             bufRecord.set(j, null);
@@ -296,31 +296,31 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
               bufRecord.setBoolean(j, rs.getBoolean(j + 1));
               break;
             case BIGINT:
-              bufRecord.setBigint(j, (long)rs.getDouble(j + 1));
+              bufRecord.setBigint(j, (long) rs.getDouble(j + 1));
               break;
             case INT:
-              bufRecord.setInt(j, (int)rs.getDouble(j + 1));
+              bufRecord.setInt(j, (int) rs.getDouble(j + 1));
               break;
             case TINYINT:
-              bufRecord.setTinyint(j, (byte)rs.getDouble(j + 1));
+              bufRecord.setTinyint(j, (byte) rs.getDouble(j + 1));
               break;
             case SMALLINT:
-              bufRecord.setSmallint(j, (short)rs.getShort(j + 1));
+              bufRecord.setSmallint(j, (short) rs.getShort(j + 1));
               break;
             case DOUBLE:
               bufRecord.setDouble(j, rs.getDouble(j + 1));
               break;
             case FLOAT:
-              bufRecord.setFloat(j, (float)rs.getDouble(j + 1));
+              bufRecord.setFloat(j, (float) rs.getDouble(j + 1));
               break;
             case DATETIME:
-              bufRecord.setDatetime(j, new java.util.Date((long)(rs.getDouble(j + 1) * 1000.0)));
+              bufRecord.setDatetime(j, new java.util.Date((long) (rs.getDouble(j + 1) * 1000.0)));
               break;
             case DATE:
-              bufRecord.setDate(j, new java.sql.Date((long)(rs.getDouble(j + 1) * 1000.0)));
+              bufRecord.setDate(j, new java.sql.Date((long) (rs.getDouble(j + 1) * 1000.0)));
               break;
             case TIMESTAMP:
-              bufRecord.setTimestamp(j, new Timestamp((long)(rs.getDouble(j + 1) * 1000.0)));
+              bufRecord.setTimestamp(j, new Timestamp((long) (rs.getDouble(j + 1) * 1000.0)));
               break;
             case DECIMAL:
               bufRecord.setDecimal(j, new BigDecimal(rs.getString(j + 1)));
@@ -338,10 +338,10 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
               bufRecord.setBinary(j, new Binary(rs.getBytes(j + 1)));
               break;
             case INTERVAL_YEAR_MONTH:
-              bufRecord.setIntervalYearMonth(j, new IntervalYearMonth((int)rs.getDouble(j + 1)));
+              bufRecord.setIntervalYearMonth(j, new IntervalYearMonth((int) rs.getDouble(j + 1)));
               break;
             case INTERVAL_DAY_TIME:
-              bufRecord.setIntervalDayTime(j, new IntervalDayTime((int)rs.getDouble(j + 1), 0));
+              bufRecord.setIntervalDayTime(j, new IntervalDayTime((int) rs.getDouble(j + 1), 0));
               break;
             case MAP:
             case ARRAY:
@@ -366,7 +366,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
 
   /**
    * close database connection
-   * */
+   */
   public void close() {
     if (this.conn != null) {
       try {
@@ -380,7 +380,7 @@ public class SqliteMiddleStorage<T> implements MiddleStorage {
    * Create table in sqlite. The schema is as same as odps table.
    * 
    * @throws Exception
-   * */
+   */
   private void createTable() throws Exception {
     TableSchema schema = context.getSchema();
     int columnNumber = schema.getColumns().size();
