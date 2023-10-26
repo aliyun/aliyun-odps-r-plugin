@@ -67,7 +67,7 @@ public class ROdps {
   private final static int RETRY_MAX = 3;
   private final static String PROG_VERSION = "rodps-1.3";
   private String LOGVIEW_HOST;
-  private HashMap settings;
+  private HashMap<String, String> settings;
 
   public ROdps(String projectName, String accessID, String accessKey, String endPoint,
       String dtEndpoint, String logviewHost, String log4j_properties) throws ROdpsException,
@@ -125,7 +125,7 @@ public class ROdps {
       LOGVIEW_HOST = logviewHost.trim();
     }
 
-    settings = new HashMap();
+    settings = new LinkedHashMap<>();
   }
 
   public void setBizId(String s) {
