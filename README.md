@@ -1,6 +1,6 @@
 # RODPS: ODPS Plugin for R
 
-[![Build Status](https://travis-ci.org/aliyun/aliyun-odps-r-plugin.svg?branch=master)](https://travis-ci.org/aliyun/aliyun-odps-r-plugin)
+[![Building RODPS](https://github.com/aliyun/aliyun-odps-r-plugin/actions/workflows/building.yaml/badge.svg?branch=master)](https://github.com/aliyun/aliyun-odps-r-plugin/actions/workflows/building.yaml)
 
 
 ## Features
@@ -43,7 +43,7 @@ install.packages('devtools')
 3.Install RODPS package:
 
 ```
-install.packages('https://github.com/aliyun/aliyun-odps-r-plugin/releases/download/v2.1.2/RODPS_2.1.2.tar.gz', type="source", repos=NULL)
+install.packages('https://github.com/aliyun/aliyun-odps-r-plugin/releases/download/v2.1.3/RODPS_2.1.3.tar.gz', type="source", repos=NULL)
 ```
 
 4.Please make sure the environment variable `RODPS_CONFIG` is set to `path/to/odps_config.ini`
