@@ -12,54 +12,58 @@
 
 ## Requirements
 
-- Java: Recommend Java 8 (Java 9 or higher might encounter JAXB issue)
-- R: latest release (RODPS itself support R 1.8+, its dependency libraries does not)
+System dependencies:
 
-R libraries
+- Java 8+
+- R 1.8+
 
-- rJava
-- DBI
-- RSQLite
+R libraries:
+
+- [rJava](https://cran.r-project.org/web/packages/rJava/index.html)
+- [DBI](https://cran.r-project.org/web/packages/DBI/index.html)
+- [RSQLite](https://cran.r-project.org/web/packages/RSQLite/index.html)
 
 ## Installation
 
-1.Download the package:
+1. Install the R dependencies:
 
-[Release page](https://github.com/aliyun/aliyun-odps-r-plugin/releases)
-
-2.Install the dependencies:
-
-```
+```R
 install.packages('DBI')
 install.packages('rJava')
 install.packages('RSQLite')
 ```
 Or you can use `devtools` to help you resolve dependencies:
 
-```
+```R
 install.packages('devtools')
 ```
 
-3.Install RODPS package:
+2. Install RODPS
 
-```
-install.packages('https://github.com/aliyun/aliyun-odps-r-plugin/releases/download/v2.1.3/RODPS_2.1.3.tar.gz', type="source", repos=NULL)
-```
+    2.1. Install from release package
+   
+    ```R
+    install.packages('https://github.com/aliyun/aliyun-odps-r-plugin/releases/download/v2.1.3/RODPS_2.1.3.tar.gz', type="source", repos=NULL)
+    ```
 
-4.Please make sure the environment variable `RODPS_CONFIG` is set to `path/to/odps_config.ini`
+    2.2. Install from source
+
+    * Clone the source repo and build with `./build.sh`
+    * Install built package: `R CMD INSTALL target/RODPS_2.1.3.tar.gz`
 
 
-```
+
+## Getting Started
+
+1. Please make sure the environment variable `RODPS_CONFIG` is set to `path/to/odps_config.ini`
+
+```bash
 export RODPS_CONFIG=path/to/odps_config.ini
 ```
 
 See the configuration template: [odps_config.ini.template](https://github.com/aliyun/aliyun-odps-r-plugin/blob/master/odps_config.ini.template)
 
-### Trouble shooting
-
-- To windows users: when installing R, DO NOT install both 32bit and 64bit on your system, which will introduce compilation trouble in later installation of rJava.
-
-## Getting Started
+2. Basic RODPS functions:
 
 ```R
 > library("RODPS")  # Load RODPS
@@ -69,19 +73,25 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 >
 > rodps.sql('create table test_table(id bigint);')   # execute sql
 >
-> names(iris) <- gsub("\\.","_",names(iris))   # rename columns
-> rodps.table.write(iris, 'iris')              # write dataframe to ODPS
+> names(iris) <- gsub("\\.","_",names(iris))                                   # rename columns
+> rodps.table.write(iris, 'iris')                                              # write dataframe to ODPS
 >
-> rodps.table.sample.srs('tbl1','small_tbl1', 100 ) # sampling by raw
+> rodps.table.sample.srs('tbl1','small_tbl1', 100 )                            # sampling by raw
 >
 > rodps.table.hist(tblname='iris', colname='species', col=rainbow(10), freq=F) # create a histogram
 >
 > library(rpart)
 > fit <- rpart(Species~., data=iris)
-> rodps.predict.rpart(fit, srctbl='iris',tgttbl='iris_p') # modeling
+> rodps.predict.rpart(fit, srctbl='iris',tgttbl='iris_p')                      # modeling
 ```
 
-## Type System
+## Under the Hood
+
+### Design Architecture
+
+For the mind map of related concepts, please refer to the [MindMapDoc](https://github.com/aliyun/aliyun-odps-r-plugin/blob/master/mindmap.pdf)
+
+### Type System
 
 **All numeric in R have possibility of precision loss.**
 
@@ -110,9 +120,9 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 
 * BIGINT(64bit) from MaxCompute is stored and calculated as double(64bit) in RODPS. Precision loss might happen when casting BIGINT to double, which shrinks the min/max value could be written back to MaxCompute/ODPS.
 
-## Architecture
+### Trouble shooting
 
-[![](mindmap-thumb.png)](mindmap.pdf)
+- For Windows users: DO NOT install BOTH 32bit and 64bit R on your system, which will introduce compiling issues in the installation of `rJava`.
 
 ## License
 
