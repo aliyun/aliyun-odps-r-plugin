@@ -739,4 +739,119 @@ public class ROdps {
     }
     return true;
   }
+
+  /***
+   * Enable MQAC
+   * @param sql
+   * @param filename
+   * @return
+   * @throws ROdpsException
+   */
+  public LinkedHashMap<String, String> runSqlWithMCQA(String sql, String filename) throws ROdpsException {
+    // If the client forget to end with a semi-colon, append it.
+    if (!sql.contains(";")) {
+      sql += ";";
+    }
+
+    LOG.debug("sql: " + sql);
+
+    SQLExecutorBuilder builder = SQLExecutorBuilder.builder();
+    SQLExecutor sqlExecutor = null;
+
+    try {
+      sqlExecutor = builder.odps(odps).executeMode(ExecuteMode.INTERACTIVE).fallbackPolicy(FallbackPolicy.alwaysFallbackPolicy()).build();
+      Map<String, String> queryHint = new HashMap<>();
+      queryHint.put("odps.sql.mapper.split.size", "128");
+      sqlExecutor.run(sql, queryHint);
+      ResultSet rs = sqlExecutor.getResultSet();
+
+      File csvFile = new File(filename);
+      FileWriter fileWriter = new FileWriter(csvFile);
+      BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+      int count = 0;
+      List<Column> columnsRecord = new ArrayList<>();
+
+
+      LinkedHashMap<String, String> result = new LinkedHashMap<>();
+
+      //when the result is empty
+      if (!rs.hasNext()) {
+        for (int i = 0; i < rs.getTableSchema().getColumns().size(); i++) {
+          result.put(rs.getTableSchema().getColumn(i).getName(), rs.getTableSchema().getColumn(i).getTypeInfo().getTypeName());
+        }
+        return result;
+      }
+
+
+      while (rs.hasNext()) {
+        Record record = rs.next();
+
+        if (count == 0) {
+          StringBuilder header = new StringBuilder();
+          columnsRecord = Arrays.asList(record.getColumns());
+          for (int i = 0; i < columnsRecord.size(); i++) {
+            result.put(columnsRecord.get(i).getName(), columnsRecord.get(i).getType().toString());
+
+            header.append(columnsRecord.get(i).getName());
+            if (i != columnsRecord.size() - 1) {
+              header.append(",");
+            }
+          }
+          header.append("\n");
+          bufferedWriter.write(header.toString());
+
+        }
+
+        StringBuilder line = new StringBuilder();
+        int j = 0;
+        for (Column c : columnsRecord) {
+          line.append("\"");
+          if (record.get(c.getName()) == null) {
+            line.append("NA");
+          } else {
+            switch (c.getType().toString()) {
+              case "STRING":
+                line.append(record.getString(c.getName()).replaceAll("\"", "\"\""));
+                break;
+              case "INT":
+              case "DATE":
+                line.append(record.get(c.getName()));
+                break;
+              case "BIGINT":
+                line.append(record.getBigint(c.getName()));
+                break;
+              case "BOOLEAN":
+                line.append(record.getBoolean(c.getName()));
+                break;
+              case "DOUBLE":
+                line.append(record.getDouble(c.getName()));
+                break;
+              default:
+                line.append("Unknown");
+            }
+          }
+          line.append("\"");
+          if (j != columnsRecord.size() - 1) {
+            line.append(",");
+          }
+          j++;
+        }
+
+        line.append("\n");
+        bufferedWriter.write(line.toString());
+
+        count++;
+      }
+
+      bufferedWriter.close();
+      fileWriter.close();
+
+      return result;
+    } catch (Exception e) {
+      LOG.error("runSqlTask error,sql = " + sql, e);
+      throw new ROdpsException(e);
+    }
+  }
+
 }
