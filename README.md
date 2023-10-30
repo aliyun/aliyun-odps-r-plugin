@@ -55,13 +55,13 @@ install.packages('devtools')
 
 ## Getting Started
 
-1. Please make sure the environment variable `RODPS_CONFIG` is set to `path/to/odps_config.ini`
+1. Please make sure the environment variable `RODPS_CONFIG` is set to `/path/to/odps_config.ini`
 
 ```bash
-export RODPS_CONFIG=path/to/odps_config.ini
+export RODPS_CONFIG=/path/to/odps_config.ini
 ```
 
-See the configuration template: [odps_config.ini.template](https://github.com/aliyun/aliyun-odps-r-plugin/blob/master/odps_config.ini.template)
+See the configuration template: [odps_config.ini.template](examples/odps_config.ini.template)
 
 2. Basic RODPS functions:
 
@@ -89,7 +89,7 @@ See the configuration template: [odps_config.ini.template](https://github.com/al
 
 ### Design Architecture
 
-For the mind map of related concepts, please refer to the [MindMapDoc](https://github.com/aliyun/aliyun-odps-r-plugin/blob/master/mindmap.pdf)
+For the mind map of related concepts, please refer to the [MindMapDoc](docs/mindmap.pdf)
 
 ### Type System
 

@@ -1,13 +1,15 @@
-source ./config.sh
+#!/bin/bash
+basepath=$(cd "$(dirname "$0")";pwd)
+source $basepath/../config.sh
 VERSIONDATE=`date +"%Y-%m-%d %H:%M:%S"`
-cat > ./RODPS/R/odps_version.R <<__EOF__
+cat > $basepath/../RODPS/R/odps_version.R <<__EOF__
 rodps.version <- function()
 {
     print("RODPS ${RVERSION}")
     print("BUILDDATE ${VERSIONDATE}")
 }
 __EOF__
-cat > ./RODPS/DESCRIPTION << __EOF__
+cat > $basepath/../RODPS/DESCRIPTION << __EOF__
 Package: RODPS
 Version: ${RVERSION}
 Title: R interface to interact with MaxCompute/ODPS
