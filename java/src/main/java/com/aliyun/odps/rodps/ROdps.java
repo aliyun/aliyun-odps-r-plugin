@@ -762,6 +762,7 @@ public class ROdps {
       sqlExecutor = builder.odps(odps).executeMode(ExecuteMode.INTERACTIVE).fallbackPolicy(FallbackPolicy.alwaysFallbackPolicy()).build();
       Map<String, String> queryHint = new HashMap<>();
       queryHint.put("odps.sql.mapper.split.size", "128");
+      queryHint.put("odps.sql.submit.mode", "script");
       sqlExecutor.run(sql, queryHint);
       ResultSet rs = sqlExecutor.getResultSet();
 
