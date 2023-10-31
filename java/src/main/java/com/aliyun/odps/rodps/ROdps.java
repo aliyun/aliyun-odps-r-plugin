@@ -12,16 +12,9 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.aliyun.odps.rodps;
 
-import java.io.BufferedReader;
-import java.io.CharArrayWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -39,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.aliyun.odps.*;
 import com.aliyun.odps.Instance;
 import com.aliyun.odps.LogView;
 import com.aliyun.odps.Odps;
@@ -57,6 +51,12 @@ import com.aliyun.odps.rodps.DataTunnel.ROdpsException;
 import com.aliyun.odps.task.SQLTask;
 import com.aliyun.odps.tunnel.TableTunnel.DownloadSession;
 import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
+import com.aliyun.odps.data.Record;
+import com.aliyun.odps.data.ResultSet;
+import com.aliyun.odps.sqa.ExecuteMode;
+import com.aliyun.odps.sqa.FallbackPolicy;
+import com.aliyun.odps.sqa.SQLExecutor;
+import com.aliyun.odps.sqa.SQLExecutorBuilder;
 
 public class ROdps {
 
@@ -749,7 +749,7 @@ public class ROdps {
    */
   public LinkedHashMap<String, String> runSqlWithMCQA(String sql, String filename) throws ROdpsException {
     // If the client forget to end with a semi-colon, append it.
-    if (!sql.contains(";")) {
+    if (!sql.endsWith(";")) {
       sql += ";";
     }
 
