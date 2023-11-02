@@ -7,7 +7,7 @@ rm -rf $basepath/build/*
 
 # Generate documentation
 echo "Generating documentation..."
-sh -x $basepath/gendoc.sh
+sh -x $basepath/docs/gendoc.sh
 
 javasrc=$basepath/java
 libpath=$basepath/RODPS/inst/lib
@@ -27,7 +27,7 @@ cd $basepath
 rm -f $libpath/*
 cp $ThirdLibPath/*.jar $libpath
 cp $ThirdLibPath/../*.jar $libpath
-cp log4j.properties $libpath
+cp $javasrc/src/main/resources/log4j.properties $libpath
 
 # tar R odps package
 tar zcvf $RPackageName RODPS
