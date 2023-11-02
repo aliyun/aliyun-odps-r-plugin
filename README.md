@@ -48,7 +48,7 @@ install.packages('devtools')
 
     2.2. Install from source
 
-    * Clone the source repo and build with `./build.sh`
+    * Clone the source repo and build with `sh tools/build.sh`
     * Install built package: `R CMD INSTALL target/RODPS_2.1.3.tar.gz`
 
 

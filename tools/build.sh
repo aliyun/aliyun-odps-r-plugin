@@ -1,5 +1,5 @@
 #! /bin/bash
-basepath=$(cd "$(dirname "$0")";pwd)
+basepath=$(cd "$(dirname "$0")";pwd)/..
 source $basepath/config.sh
 
 mkdir -p $basepath/build > /dev/null
