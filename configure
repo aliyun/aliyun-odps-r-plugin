@@ -1,4 +1,6 @@
 #!/bin/bash
+# Auto configuation
+# Only required when built from source.
 basepath=$(cd "$(dirname "$0")";pwd)
 source $basepath/VERSION
 VERSIONDATE=`date +"%Y-%m-%d %H:%M:%S"`
