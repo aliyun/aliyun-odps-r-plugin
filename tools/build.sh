@@ -1,7 +1,6 @@
 #!/bin/bash
-basepath=$(cd "$(dirname "$0")";pwd)
-
-RVERSION="2.1.5"
+basepath=$(cd "$(dirname "$0")";pwd)/..
+source $basepath/VERSION
 VERSIONDATE=`date +"%Y-%m-%d %H:%M:%S"`
 
 echo "Configuring RODPS package..."

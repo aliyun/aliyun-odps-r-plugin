@@ -6,7 +6,7 @@ Description: This package is developed for R to interact with
 Author: ruibo.lirb@alibaba-inc.com
 Maintainer: Xiaming Chen <xiaming.cxm@alibaba-inc.com>
 URL: http://github.com/aliyun/aliyun-odps-r-plugin
-License: file LICENCE
+License: file LICENSE
 Depends: R (>= 1.8.0), utils, rJava, DBI, RSQLite
 Imports: methods
 SystemRequirements: Java (>= 8)
