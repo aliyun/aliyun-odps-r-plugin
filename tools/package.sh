@@ -1,7 +1,7 @@
 #!/bin/bash
 basepath=$(cd "$(dirname "$0")";pwd)/..
 
-sh $basepath/tools/build.sh
+sh $basepath/configure
 
 echo "Check RODPS package..."
 R --no-save -e "library(devtools);devtools::check(cran = FALSE)devtools::spell_check()"
