@@ -1,20 +1,17 @@
 #!/bin/bash
-# Auto configuation
-# Only required when built from source.
-basepath=$(cd "$(dirname "$0")";pwd)
-source $basepath/VERSION
+basepath=$(cd "$(dirname "$0")";pwd)/..
+
+source $basepath/config.version
 VERSIONDATE=`date +"%Y-%m-%d %H:%M:%S"`
 
 echo "Configuring RODPS package..."
+sed -I '' -E "s|Version: .*|Version: ${RVERSION}|g" $basepath/DESCRIPTION
 cat > $basepath/R/odps_version.R <<__EOF__
-rodps.version <- function()
-{
+rodps.version <- function() {
     print("RODPS ${RVERSION}")
     print("BUILDDATE ${VERSIONDATE}")
 }
 __EOF__
-
-sed -I '' -E "s|Version: .*|Version: ${RVERSION}|g" $basepath/DESCRIPTION
 
 buildpath=${basepath}/build
 if [ -e ${buildpath} ]; then rm -rf ${buildpath}; fi
