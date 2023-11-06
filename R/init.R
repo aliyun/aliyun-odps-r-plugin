@@ -61,7 +61,7 @@ init.java.env <- function(libname, pkgname) {
     } else {
         .jinit()
     }
-    jarPath <- paste(libname, pkgname, "lib", sep = .Platform$file.sep)
+    jarPath <- paste(libname, pkgname, "java", sep = .Platform$file.sep)
     jarFiles <- list.files(jarPath)
     .jaddClassPath(paste(jarPath, "/.", sep = ""))
     for (i in 1:length(jarFiles)) {
@@ -73,7 +73,7 @@ init.java.env <- function(libname, pkgname) {
 }
 
 init.dtsdk.env <- function(libname, pkgname) {
-    jarPath <- paste(libname, pkgname, "lib", "DT", sep = .Platform$file.sep)
+    jarPath <- paste(libname, pkgname, "java", "DT", sep = .Platform$file.sep)
     jarFiles <- list.files(jarPath)
     for (i in 1:length(jarFiles)) {
         jarFiles[i] <- paste(jarPath, jarFiles[i], sep = .Platform$file.sep)

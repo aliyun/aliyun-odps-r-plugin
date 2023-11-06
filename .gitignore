@@ -14,3 +14,7 @@ build/
 rodps.log
 rodps.log.*
 *.versionsBackup
+*.Rproj
+.vscode/
+.java-version
+.python-version

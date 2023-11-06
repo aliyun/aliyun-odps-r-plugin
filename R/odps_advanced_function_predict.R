@@ -117,8 +117,10 @@ rodps.predict.fda <- function(object, srctbl, tgttbl, type = "class", prior, dim
                 dimension.set <- k
             dimension <- max(dimension.set)
         }
-    } else dimension <- min(max(dimension), k)
-    # y <- predict(object$fit, newdata)　　#假设object$fit$degree=1,
+    } else {
+        dimension <- min(max(dimension), k)
+    }
+    # y <- predict(object$fit, newdata) 假设object$fit$degree=1,
     # object$fit$monomial=FALSE
     yvar.name = paste(all.vars(object$terms)[attr(object$terms, "response")], seq(1:ncol(object$fit$coefficients)),
         sep = "_ln")
