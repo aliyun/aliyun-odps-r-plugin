@@ -5,7 +5,7 @@ source $basepath/config.version
 VERSIONDATE=`date +"%Y-%m-%d %H:%M:%S"`
 
 echo "Configuring RODPS package..."
-sed -I '' -E "s|Version: .*|Version: ${RVERSION}|g" $basepath/DESCRIPTION
+sed -i '' -E "s|Version: .*|Version: ${RVERSION}|g" $basepath/DESCRIPTION
 cat > $basepath/R/odps_version.R <<__EOF__
 rodps.version <- function() {
     print("RODPS ${RVERSION}")
