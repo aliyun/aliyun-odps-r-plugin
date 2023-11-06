@@ -1,7 +1,7 @@
 #!/bin/bash
 basepath=$(cd "$(dirname "$0")";pwd)
 
-RVERSION="2.1.4"
+RVERSION="2.1.5"
 VERSIONDATE=`date +"%Y-%m-%d %H:%M:%S"`
 
 echo "Configuring RODPS package..."
@@ -12,6 +12,8 @@ rodps.version <- function()
     print("BUILDDATE ${VERSIONDATE}")
 }
 __EOF__
+
+sed -I '' -E "s|Version: .*|Version: ${RVERSION}|g" $basepath/DESCRIPTION
 
 buildpath=${basepath}/build
 if [ -e ${buildpath} ]; then rm -rf ${buildpath}; fi
