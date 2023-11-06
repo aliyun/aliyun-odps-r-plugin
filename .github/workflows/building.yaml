@@ -18,7 +18,7 @@ jobs:
     - name: Install deps
       run: |
         sudo apt install build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libharfbuzz-dev libfribidi-dev
-        R --no-save -e "install.packages('devtools', repo='https://mirrors.nju.edu.cn/CRAN')"
+        R --no-save -e "install.packages(c('devtools', 'formatR'), repo='https://mirrors.nju.edu.cn/CRAN')"
     - name: Building package
       run: |
         ./tools/package.sh
