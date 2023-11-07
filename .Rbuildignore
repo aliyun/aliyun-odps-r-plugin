@@ -1,0 +1,12 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.github$
+^\.gitignore$
+^\.java-version$
+^Dockerfile$
+^docs$
+^examples$
+^hooks$
+^tests$
+^tools$
+^.*\.ini$

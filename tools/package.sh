@@ -1,11 +1,9 @@
 #!/bin/bash
 basepath=$(cd "$(dirname "$0")";pwd)/..
-
-sh $basepath/tools/build.sh
-sh $basepath/tools/gendoc.sh
+sh $basepath/configure
 
 echo "Check RODPS package..."
-R --no-save -e "library(devtools);devtools::check(cran=FALSE, document=FALSE);devtools::spell_check()"
+R --no-save -e "library(devtools);devtools::check()"
 
 echo "Build RODPS package..."
-R --no-save -e "library(devtools);devtools::build(path = 'build')"
+R --no-save -e "library(devtools);devtools::build(path = '.')"

@@ -8,6 +8,7 @@ Maintainer: Xiaming Chen <xiaming.cxm@alibaba-inc.com>
 URL: http://github.com/aliyun/aliyun-odps-r-plugin
 License: file LICENSE
 Depends: R (>= 1.8.0), utils, rJava, DBI, RSQLite
-Imports: methods
+Encoding: UTF-8
 SystemRequirements: Java (>= 8)
+Imports: methods
 RoxygenNote: 7.2.3

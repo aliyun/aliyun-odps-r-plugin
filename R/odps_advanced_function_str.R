@@ -1,11 +1,15 @@
-#' @examples
-#' data.frame:   1000 obs. of  2 variables:
-#' x: int 1 2 3 4 5 6 7 8 9 10 ...
-#' y: int 1 2 3 4 5 6 7 8 9 10 ...
 str.rodps.data <- function(rd) {
     rodps.str(rd@tbl)
 }
 
+#' Display Table
+#' 
+#' Print table as formatted string.
+#' 
+#' @param tbl RODPS Table object
+#' @return Formatted string.
+#' @seealso [str.rodps.data()]
+#' @export
 rodps.str <- function(tbl) {
     obs <- rodps.table.rows(tbl)
     des <- rodps.table.desc(tbl)

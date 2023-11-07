@@ -1,120 +1,59 @@
+#' Show help information
+#'
+#' @return NULL
+#' @export
 rodps.help <- function() {
     cat("Please try help(rodps) \n")
 }
 
-rodps.table.list <- function(pattern = NULL, projectname = NULL) {
+#' Set business ID
+#'
+#' @param bizid business id, e.g. 012345^.
+#' @author \email{ruibo.lirb@alibaba-inc.com}
+#' @seealso \code{\link{RODPS}}, \code{\link{rodps.sql}}
+#' @examples
+#' ## set business id to 012345
+#' \dontrun{rodps.bizid('012345^')}
+#' @export
+rodps.bizid <- function(bizid) {
     .check.init()
-
-    if (is.null(projectname)) {
-        projectname <- rodps.project.current()
-    } else {
-        rodps.project.use(projectname)
-    }
-
-    tables <- try(odpsOperator$getTables(projectname, pattern))
-    if ("try-error" %in% class(tables)) {
-        stop("Exception occured when listing tables")
-    }
-    return(.change.data(tables))
+    odpsOperator$setBizId(bizid)
 }
 
-rodps.list.table <- rodps.table.list
-rodps.list.tables <- rodps.table.list
-
-rodps.table.partitions <- function(full.tablename) {
+#' Set task properties
+#'
+#' Set properties for SQL task
+#'
+#' @param key setting name, e.g. odps.sql.allow.fullscan.
+#' @param value setting value.
+#' @author \email{ruibo.lirb@alibaba-inc.com}
+#' @seealso  \code{\link{RODPS}}, \code{\link{rodps.sql}},
+#'   \code{\link{rodps.unset}},
+#' @examples
+#' ## enable full table scan
+#' \dontrun{rodps.set('odps.sql.allow.fullscan', 'true')}
+#' @export
+rodps.set <- function(key, value) {
     .check.init()
-    df <- rodps.sql(paste("show partitions", full.tablename))
-    return(df)
+    odpsOperator$set(key, value)
 }
 
-rodps.partitions.table <- rodps.table.partitions
-
-rodps.table.drop <- function(full.tablename, partition = NULL) {
+#' Unset task properties
+#'
+#' Unset properties for SQL task
+#'
+#' @param key setting name, e.g. odps.sql.allow.fullscan.
+#' @author \email{ruibo.lirb@alibaba-inc.com}
+#' @seealso  \code{\link{RODPS}}, \code{\link{rodps.sql}},
+#'   \code{\link{rodps.set}},
+#' @examples
+#' ## set full table scan to its default value
+#' \dontrun{rodps.unset('odps.sql.allow.fullscan')}
+#' @export
+rodps.unset <- function(key) {
     .check.init()
-    p.t <- rodps.split.ftn(full.tablename)
-
-    projectname <- p.t$projectname
-    tablename <- p.t$tablename
-
-    .check.tablename(tablename)
-    if (!is.null(projectname)) {
-        ftn <- paste(projectname, ".", tablename, sep = "")
-    } else {
-        ftn <- tablename
-    }
-    if (is.null(partition)) {
-        sql <- paste("drop table if exists", ftn)
-    } else {
-        sql <- paste("alter table", ftn, "drop partition(", partition, ")")
-    }
-    rodps.sql(sql)
-    return(TRUE)
+    odpsOperator$unset(key)
 }
-
-rodps.drop.table <- rodps.table.drop
-
-rodps.table.desc <- function(full.tablename, partition = NULL) {
-    .check.init()
-    p.t <- rodps.split.ftn(full.tablename)
-    projectname <- p.t$projectname
-    tablename <- p.t$tablename
-
-    if (is.null(projectname)) {
-        projectname <- rodps.project.current()
-    }
-
-    .check.tablename(tablename)
-    tableMeta <- odpsOperator$describeTable(.jnew("java/lang/String", projectname),
-        tablename, partition)
-    ret <- .change.to.list(tableMeta)
-    ret$columns = .column.to.dataframe(ret$columns)
-    if (length(ret$partition_keys) > 0) {
-        ret$partition_keys <- .column.to.dataframe(ret$partition_keys)
-    }
-    if ("windows" == .Platform$OS.type) {
-        ret$comment <- iconv(ret$comment, "utf-8", "gbk")
-        ret$columns$comments <- iconv(ret$columns$comments, "utf-8", "gbk")
-    }
-    return(ret)
-}
-
-rodps.desc.table <- rodps.table.desc
-
-# 将pt|string| 转成dataframe
-.column.to.dataframe <- function(cols) {
-    len <- length(cols)
-    names <- c()
-    types <- c()
-    comments <- c()
-    for (i in 1:len) {
-        items <- strsplit(cols[i], "|", fixed = TRUE)
-        names[i] <- items[[1]][1]
-        types[i] <- items[[1]][2]
-        if (length(items[[1]]) > 2) {
-            comments[i] <- items[[1]][3]
-        } else {
-            comments[i] <- NA
-        }
-    }
-    return(data.frame(names, types, comments, stringsAsFactors = FALSE))
-}
-rodps.table.exist <- function(full.tablename, partition = NULL) {
-    .check.init()
-    p.t <- rodps.split.ftn(full.tablename)
-    projectname <- p.t$projectname
-    tablename <- p.t$tablename
-
-    if (is.null(projectname)) {
-        projectname <- rodps.project.current()
-    }
-
-    .check.tablename(tablename)
-    tableExist <- odpsOperator$isTableExist(.jnew("java/lang/String", projectname),
-        tablename, partition)
-    return(tableExist)
-}
-
-rodps.exist.table <- rodps.table.exist
 
 .rodps.bigSql <- function(query, memsize = 10737518240) {
     .check.init()
@@ -145,29 +84,18 @@ rodps.exist.table <- rodps.table.exist
     }
 }
 
-rodps.project.use <- function(projectname) {
-    .check.init()
-    if (is.null(projectname) || projectname == "") {
-        stop(error("invalid_project_name"))
-    }
-    odpsOperator$useProject(projectname)
-}
-
-rodps.bizid <- function(bizid) {
-    .check.init()
-    odpsOperator$setBizId(bizid)
-}
-
-rodps.set <- function(key, value) {
-    .check.init()
-    odpsOperator$set(key, value)
-}
-
-rodps.unset <- function(key) {
-    .check.init()
-    odpsOperator$unset(key)
-}
-
+#' Sql Command
+#'
+#' Run SQL command and return result(in data.frame type).
+#'
+#' @param query sql command,ex. select/insert/etc.
+#' @author \email{yunyuan.zhangyy@alibaba-inc.com}
+#' @seealso   \code{\link{RODPS}}, \code{\link{rodps.table}},
+#'   \code{\link{rodps.project}}
+#' @examples
+#' ## select the data of 'sales' in January ,and store the result in data.frame
+#' \dontrun{ data <- rodps.sql('select * from sales where month=1')}
+#' @export
 rodps.sql <- function(query) {
     .check.init()
     if (is.null(query) || query == "") {
@@ -217,6 +145,7 @@ rodps.sql <- function(query) {
     return(vlist)
 }
 
+#' @rdname rodps.sql
 rodps.query <- rodps.sql
 
 # 不支持运行的query
@@ -236,90 +165,6 @@ blacklist <- function(query) {
     return(head)
 }
 
-rodps.table.size <- function(full.tablename, partition = NULL) {
-    .check.init()
-    p.t <- rodps.split.ftn(full.tablename)
-    projectname <- p.t$projectname
-    tablename <- p.t$tablename
-
-    .check.tablename(tablename)
-    size <- odpsOperator$getTableSize(.jnew("java/lang/String", projectname), tablename,
-        partition)
-
-    return(size)
-
-}
-
-rodps.size.table <- rodps.table.size
-
-# dataframe can be written to a non-exist table or partition
-rodps.table.write <- function(dataframe, full.tablename, partition = NULL, tablecomment = NULL,
-    isdebug = FALSE, thread = 8) {
-    .check.init()
-    p.t <- rodps.split.ftn(full.tablename)
-    projectname <- p.t$projectname
-    tablename <- p.t$tablename
-
-    if (is.null(projectname)) {
-        projectname <- rodps.project.current()
-    }
-
-    .check.tablename(tablename)
-    if (!is.data.frame(dataframe)) {
-        stop("dataframe should be class of data.frame")
-    }
-
-    if (length(colnames(dataframe)) == 0) {
-        stop("dataframe should have as least one column")
-    }
-
-    if (!is.null(partition) && !rodps.table.exist(full.tablename)) {
-        stop(sprintf("Table not exists,table=%s partition=%s", full.tablename, partition))
-    }
-    sql <- NULL
-    if (!rodps.table.exist(full.tablename)) {
-        sql <- .rodps.generate.DDL(full.tablename, dataframe, tablecomment)
-    }
-    if (!is.null(partition) && !rodps.table.exist(full.tablename, partition)) {
-        sql <- paste("alter table", full.tablename, "add partition(", odpsOperator$formatPartition(partition,
-            "'", ","), ")")
-    }
-    if (!is.null(sql)) {
-        ret <- try(rodps.sql(sql))
-        if ("try-error" %in% class(ret)) {
-            cat("Exception occured when creating table\n")
-            cat(sql)
-            cat("\n")
-        }
-    }
-
-    if (nrow(dataframe) == 0) {
-        return(TRUE)
-    }
-
-    tempprefix <- paste("rodps", ceiling(runif(1, 1, 1e+06)), "_", sep = "")
-    filename <- tempfile(tempprefix, rodpsTmpdir)
-
-    actual_thread <- as.integer(thread)
-    if (nrow(dataframe) < thread * 100) {
-        actual_thread <- as.integer(1)
-    }
-    if ("windows" == .Platform$OS.type) {
-        dataframe <- .dataframe.code.conv(dataframe, "", "UTF-8")
-    }
-    dbNames <- .dataframe.to.sqlite(dataframe, actual_thread, filename, tablename,
-        isdebug)
-    odpsOperator$writeTableFromDT(projectname, tablename, partition, filename, NULL,
-        NULL, .jlong(length(dataframe[[1]])), actual_thread)
-    if (!isdebug) {
-        for (i in 1:length(dbNames)) {
-            file.remove(dbNames[i])
-        }
-    }
-    return(TRUE)
-}
-
-rodps.write.table <- rodps.table.write
 
 .dataframe.to.sqlite <- function(dataframe, thread, filename, tablename, isdebug) {
     if (!require(DBI, quietly = TRUE)) {
@@ -357,41 +202,6 @@ rodps.write.table <- rodps.table.write
     }
     return(dbNames)
 }
-
-rodps.table.read <- function(full.tablename, partition = NULL, limit = -1, memsize = 10737518240,
-    isdebug = FALSE, thread = 8) {
-    .check.init()
-    p.t <- rodps.split.ftn(full.tablename)
-    projectname <- p.t$projectname
-    tablename <- p.t$tablename
-
-    .check.tablename(tablename)
-    tablesize <- rodps.table.size(full.tablename, partition = partition)
-    if ((tablesize > memsize) && (limit == -1)) {
-        msg <- paste("whole table size (", tablesize, ") is larger than memsize (",
-            memsize, "), can not be loaded.")
-        stop(msg)
-    }
-
-    tempprefix <- paste("rodps", ceiling(runif(1, 1, 1e+05)), "_", sep = "")
-    filename <- tempfile(tempprefix, rodpsTmpdir)
-
-    results <- odpsOperator$loadTableFromDT(projectname, tablename, partition, filename,
-        NULL, NULL, as.integer(limit), as.integer(thread))
-
-    if (3 != results$size()) {
-        stop("Internal error with load table")
-    }
-    res <- .sqlite.to.dataframe(results$get(as.integer(2)), results$get(as.integer(1)),
-        tablename, isdebug)
-    if ("windows" == .Platform$OS.type) {
-        res <- .dataframe.code.conv(res, "UTF-8", "")
-    }
-    return(res)
-}
-
-rodps.read.table <- rodps.table.read
-rodps.load.table <- rodps.table.read
 
 .sqlite.to.dataframe <- function(dbs, coltype, tablename, isdebug) {
     if (!require(DBI, quietly = TRUE)) {
@@ -623,188 +433,6 @@ rodps.load.table <- rodps.table.read
     return(rodps.type.r2java[type])
 }
 
-.check.column.name <- function(colname) {
-    if (length(grep("[.]|[$]", colname)) > 0 || nchar(colname) > 128 || substr(colname,
-        1, 1) == "_")
-        stop(paste("Invalid column name", colname))
-}
-
-.rodps.generate.DDL <- function(full.tablename, dataframe, tablecomment = NULL) {
-    p.t <- rodps.split.ftn(full.tablename)
-    projectname <- p.t$projectname
-    tablename <- p.t$tablename
-
-    .check.tablename(tablename)
-    if (!is.data.frame(dataframe)) {
-        stop("dataframe should be data.frame type")
-    }
-
-    namelist <- names(dataframe)
-    for (n in namelist) .check.column.name(n)
-
-    typelist <- sapply(dataframe, .get.object.type)
-
-    sql <- paste(" CREATE TABLE ", full.tablename, " (\n", sep = "")
-    ncol <- length(namelist)
-    ntype <- length(typelist)
-
-    for (i in seq(1, ncol)) {
-        if (i != ncol) {
-            sql <- paste(sql, " ", namelist[i], "\t", typelist[i], ",\n", sep = " ")
-        } else {
-            sql <- paste(sql, " ", namelist[i], "\t", typelist[i], ")", sep = " ")
-        }
-    }
-    if (!is.null(tablecomment)) {
-        sql <- paste(sql, "\n COMMENT '", tablecomment, "'")
-    }
-    return(sql)
-}
-
-# sample data sql sample or sample() over ()
-rodps.table.sample.srs <- function(srctable, tgttable, samplerate, cond = NULL, select = NULL) {
-    rv <- round(runif(3) * 100)
-
-    .check.tablename(srctable)
-    .check.tablename(tgttable)
-    if (!is.numeric(samplerate)) {
-        stop("samplerate should be numeric")
-    }
-
-    if (is.null(select)) {
-        sel = "*"
-    } else {
-        if (!is.character(select)) {
-            stop("Select should be character")
-        }
-        sel = paste(select, sep = ",", collapse = ",")
-    }
-
-
-    if (!rodps.table.exist(srctable)) {
-        stop(paste("Table not exists ", srctable))
-    }
-    if (rodps.table.exist(tgttable)) {
-        stop(paste("Target table already exists", tgttable))
-    }
-
-    sql <- sprintf(" SELECT %s FROM %s", sel, srctable)
-    if (!is.null(cond)) {
-        if (!is.character(cond)) {
-            stop("Invalid condition expression")
-        } else {
-            sql <- paste(sql, " WHERE ", cond)
-        }
-    }
-
-    distby = sprintf(" DISTRIBUTE BY rand(%d)*10 SORT BY rand(%d)", rv[1], rv[2])
-    if (samplerate < 1) {
-        # sample by percentage
-        sql <- paste(sql, distby)
-        sql <- paste(" CREATE TABLE ", tgttable, "  AS \n SELECT * FROM (", sql,
-            " ) sub \n WHERE rand(", rv[3], ")<= ", samplerate)
-    } else {
-        # sample by abs value
-        sql <- paste(" CREATE TABLE ", tgttable, " AS  \n SELECT * FROM ( ", sql,
-            distby, " ) sub \n LIMIT ", samplerate)
-    }
-    ret <- try(rodps.sql(sql))
-    if ("try-error" %in% class(ret)) {
-        cat("Exception occurred when executing sql \n")
-        cat(sql)
-        cat("\n")
-        return(FALSE)
-    }
-    return(T)
-}
-rodps.sample.srs <- rodps.table.sample.srs
-
-# 分层抽样 select abc from ( *, row_number() over( partition by g order by
-# rand()) r_rn, rand() as r_select ) sub
-
-# 1. by percent sub where r_select < rate
-
-# 2. by_number sub where rn <= rate
-
-rodps.table.sample.strat <- function(srctable, tgttable, samplerate, strat, select = NULL) {
-    .check.tablename(srctable)
-    .check.tablename(tgttable)
-
-    if (!is.numeric(samplerate)) {
-        stop("sample rate should be numeric ")
-    }
-    if (!is.character(strat)) {
-        stop("strat should be character")
-    }
-    if (!is.null(select) && !is.character(select)) {
-        stop("select should be character")
-    }
-    if (rodps.table.exist(tgttable)) {
-        stop("target table already exists")
-    }
-
-    rv <- round(runif(3) * 100)
-    if (is.null(select)) {
-        des <- rodps.table.desc(srctable)
-        cols <- paste(des$columns$names, collapse = ",")
-    } else {
-        cols <- paste(select, collapse = ",")
-    }
-    pcols <- paste(strat, collapse = ",")
-
-    temp <- "CREATE TABLE %s AS \n SELECT %s FROM ( \n SELECT %s, \n row_number() OVER (PARTITION BY %s ORDER BY rand(%d)) sel_rownumber, \n rand(%d) sel_random  FROM %s) sub"
-    sql <- sprintf(temp, tgttable, cols, cols, pcols, rv[1], rv[2], srctable)
-
-    if (samplerate < 1) {
-        sql <- paste(sql, " WHERE sel_random <= ", samplerate)
-    } else {
-        sql <- paste(sql, " WHERE sel_rownumber <= ", samplerate)
-    }
-
-    ret <- try(rodps.sql(sql))
-    if ("try-error" %in% class(ret)) {
-        cat("Exception occurred when executing sql\n")
-        cat(sql)
-        cat("\n")
-    }
-    return(TRUE)
-
-}
-rodps.sample.strat <- rodps.table.sample.strat
-
-rodps.table.rows <- function(full.tablename, partition = NULL) {
-    .check.init()
-    p.t <- rodps.split.ftn(full.tablename)
-    projectname <- p.t$projectname
-    tablename <- p.t$tablename
-
-    .check.tablename(tablename)
-    sz <- rodps.table.size(full.tablename)
-
-    if (sz < 10 * 1024 * 1024 * 1024 || !is.null(partition) && partition != "") {
-        sql <- sprintf(" count %s ", full.tablename)
-        if (!is.null(partition) && partition != "") {
-            sql <- paste(sql, "partition(", partition, ")")
-        }
-        v <- rodps.sql(sql)
-        ret <- as.numeric(v[[1]])
-    } else {
-        sql <- sprintf("select count(*) from %s", full.tablename)
-        v <- rodps.sql(sql)
-        ret <- as.numeric(v[1, 1])
-    }
-    return(ret)
-}
-
-rodps.rows.table <- rodps.table.rows
-
-rodps.project.current <- function() {
-    .check.init()
-    return(odpsOperator$getProjectName(""))
-}
-
-rodps.current.project <- rodps.project.current
-
 # split full table name into table name and project name
 rodps.split.ftn <- function(ftn) {
     if (is.null(ftn) || !is.character(ftn) || nchar(ftn) == 0 || length(ftn) > 1) {
@@ -823,6 +451,7 @@ rodps.split.ftn <- function(ftn) {
     }
     return(ret)
 }
+
 .check.init <- function() {
     if (length(ls(envir = .GlobalEnv, pattern = "odpsOperator")) == 0 || is.null(odpsOperator)) {
         stop(print("RODPS uninitialized or session timeout, please exectue rodps.init(path), path for the path of odps_config.ini"))

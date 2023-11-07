@@ -1,4 +1,3 @@
-#
 .onLoad <- function(libname, pkgname) {
     init.java.env(libname, pkgname)
     rodpsTmpdir <<- tempdir()
@@ -191,18 +190,29 @@ add.errormsg <- function(errormap, newkey, newvalue) {
     names(errormap)[idx] <- newkey
     return(errormap)
 }
+
+#' Print Messages
+#' @export
 error <- function(error_name, msg = NULL) {
     print(geterror(error_name, msg))
 }
+
+#' @rdname error
 fatal <- function(error_name, msg = NULL) {
     print(geterror(error_name, msg))
 }
+
+#' @rdname error
 info <- function(error_name, msg = NULL) {
     print(geterror(error_name, msg))
 }
+
+#' @rdname error
 warn <- function(error_name, msg = NULL) {
     print(geterror(error_name, msg))
 }
+
+#' @noRd
 geterror <- function(error_name, msg = NULL) {
     if (is.null(error_name) || error_name == "") {
         output = ""

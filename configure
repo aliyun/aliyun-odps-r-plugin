@@ -1,0 +1,96 @@
+#!/bin/bash
+basepath=$(cd "$(dirname "$0")";pwd)
+
+RVERSION=2.1.6
+VERSIONDATE=$(date +"%Y-%m-%d %H:%M:%S")
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+function WARN {
+    printf "${YELLOW}[%s] %s${NC}\n" "$(date '+%Y-%m-%dT%H:%M:%S')" "$@"
+}
+
+function INFO {
+    printf "${GREEN}[%s] %s${NC}\n" "$(date '+%Y-%m-%dT%H:%M:%S')" "$@"
+}
+
+function ERROR {
+    printf "${RED}[%s] %s${NC}\n" "$(date '+%Y-%m-%dT%H:%M:%S')" "$@"
+}
+
+function checkcmd {
+    command -v $1 1>/dev/null 2>&1
+    return $?
+}
+
+INFO "Configuring RODPS package, version ${RVERSION}..."
+
+sed -i '' -E "s|Version: .*|Version: ${RVERSION}|g" $basepath/DESCRIPTION
+
+cat >$basepath/R/odps_version.R <<__EOF__
+rodps.version <- function() {
+    print("RODPS ${RVERSION}")
+    print("BUILDDATE ${VERSIONDATE}")
+}
+__EOF__
+
+function build_java_src {
+    INFO "Building Java dependency located at $basepath/java"
+
+    libpath=${basepath}/inst/java
+    if [ -e ${libpath} ]; then rm -rf $libpath; fi
+    mkdir -p ${libpath}
+
+    # mvn package
+    cd $basepath/java
+    mvn clean
+    mvn versions:set -DnewVersion=${RVERSION}
+    mvn package -DskipTests
+    cd $basepath
+
+    # copy jars & log4j config to libpath
+    cp $basepath/java/target/lib/*.jar $libpath
+    cp $basepath/java/target/lib/../*.jar $libpath
+    cp $basepath/java/src/main/resources/log4j.properties $libpath
+    rm -rf $basepath/java/target
+
+    INFO "Java building success!"
+}
+
+function check_java_building_env {
+    if ! checkcmd java; then
+        WARN "Java executable not found"
+        return 1
+    fi
+    if ! checkcmd mvn; then
+        WARN "Maven executable (mvn) not found"
+        return 1
+    fi
+
+    java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
+    java_major_version=$(echo "$java_version" | awk -F '.' '{print $1}')
+    INFO "Java version: ${java_version}"
+
+    maven_version=$(mvn -v | grep "Apache Maven" | awk '{print $3}')
+    maven_major_version=$(echo "$maven_version" | awk -F '.' '{print $1}')
+    INFO "Maven version: ${maven_version}"
+}
+
+function check_java_lib {
+    local targetJar="rodps-${RVERSION}.jar"
+    if [ ! -e "$basepath/inst/java/${targetJar}" ]; then
+        if ! check_java_building_env; then
+            return 1
+        fi
+    else
+        INFO "Java dependency lib found at $targetJar"
+    fi
+}
+
+if ! check_java_lib; then
+    WARN "Java dependency not found in 'inst/java', try to run local building."
+    build_java_src
+fi
