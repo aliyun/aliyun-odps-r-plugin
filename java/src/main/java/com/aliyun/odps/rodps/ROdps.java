@@ -4,9 +4,9 @@
  * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a
  * copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -14,30 +14,6 @@
  */
 
 package com.aliyun.odps.rodps;
-
-import java.io.BufferedReader;
-import java.io.CharArrayWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.aliyun.odps.Instance;
 import com.aliyun.odps.LogView;
@@ -54,9 +30,35 @@ import com.aliyun.odps.rodps.DataTunnel.DataFrameItem;
 import com.aliyun.odps.rodps.DataTunnel.RDTDownloader;
 import com.aliyun.odps.rodps.DataTunnel.RDTUploader;
 import com.aliyun.odps.rodps.DataTunnel.ROdpsException;
+import com.aliyun.odps.sqa.ExecuteMode;
+import com.aliyun.odps.sqa.FallbackPolicy;
+import com.aliyun.odps.sqa.SQLExecutor;
+import com.aliyun.odps.sqa.SQLExecutorBuilder;
 import com.aliyun.odps.task.SQLTask;
 import com.aliyun.odps.tunnel.TableTunnel.DownloadSession;
 import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
+import java.io.BufferedReader;
+import java.io.CharArrayWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ROdps {
 
@@ -64,22 +66,35 @@ public class ROdps {
   private String ODPS_PROJECT_NAME;
   private final Odps odps;
   private String DT_ENDPOINT;
-  private final static int RETRY_MAX = 3;
-  private final static String PROG_VERSION = "rodps-1.3";
+  private static final int RETRY_MAX = 3;
+  private static final String PROG_VERSION = "rodps-1.3";
   private String LOGVIEW_HOST;
   private HashMap<String, String> settings;
 
-  public ROdps(String projectName, String accessID, String accessKey, String endPoint,
-      String dtEndpoint, String logviewHost, String log4j_properties) throws ROdpsException,
-      OdpsException {
-     this(projectName, accessID, accessKey, "", endPoint, dtEndpoint, logviewHost, log4j_properties);
+  public ROdps(
+      String projectName,
+      String accessID,
+      String accessKey,
+      String endPoint,
+      String dtEndpoint,
+      String logviewHost,
+      String log4j_properties)
+      throws ROdpsException, OdpsException {
+    this(projectName, accessID, accessKey, "", endPoint, dtEndpoint, logviewHost, log4j_properties);
   }
 
-  public ROdps(String projectName, String accessID, String accessKey, String stsToken, String endPoint,
-      String dtEndpoint, String logviewHost, String log4j_properties) throws ROdpsException,
-      OdpsException {
+  public ROdps(
+      String projectName,
+      String accessID,
+      String accessKey,
+      String stsToken,
+      String endPoint,
+      String dtEndpoint,
+      String logviewHost,
+      String log4j_properties)
+      throws ROdpsException, OdpsException {
 
-    if (log4j_properties == null||log4j_properties.isEmpty())
+    if (log4j_properties == null || log4j_properties.isEmpty())
       LOG = LogFactory.getLog(ROdps.class);
     else {
       try {
@@ -91,7 +106,9 @@ public class ROdps {
       LOG = LogFactory.getLog(ROdps.class);
     }
     LOG.info("Init Odps");
-    if (projectName.equals("NA") || accessID.equals("NA") || accessKey.equals("NA")
+    if (projectName.equals("NA")
+        || accessID.equals("NA")
+        || accessKey.equals("NA")
         || endPoint.equals("NA")) {
       throw new ROdpsException("No project/accessID/accessKey/endPoint");
     }
@@ -112,9 +129,9 @@ public class ROdps {
     LOGVIEW_HOST = logviewHost;
 
     if (stsToken == null || stsToken.length() <= 0) {
-        odps = new Odps(new AliyunAccount(accessID, accessKey));
+      odps = new Odps(new AliyunAccount(accessID, accessKey));
     } else {
-        odps = new Odps(new StsAccount(accessID, accessKey, stsToken.trim()));
+      odps = new Odps(new StsAccount(accessID, accessKey, stsToken.trim()));
     }
     odps.setEndpoint(endPoint);
     odps.setDefaultProject(projectName);
@@ -141,9 +158,16 @@ public class ROdps {
   }
 
   // use tunnel sdk to upload table
-  public void writeTableFromDT(String projectName, String tableName, String partition,
-      String dataFilePathName, String columnDelimiter, String rowDelimiter, long recordCount,
-      int threadNumber) throws ROdpsException {
+  public void writeTableFromDT(
+      String projectName,
+      String tableName,
+      String partition,
+      String dataFilePathName,
+      String columnDelimiter,
+      String rowDelimiter,
+      long recordCount,
+      int threadNumber)
+      throws ROdpsException {
 
     int retryTimes = 0;
     while (true) {
@@ -156,16 +180,27 @@ public class ROdps {
           partition = formatPartition(partition, "", ",");
         }
         Context<UploadSession> context =
-            new Context<UploadSession>(odps, DT_ENDPOINT, projectName, tableName, partition, -1,
-                columnDelimiter, rowDelimiter, threadNumber);
+            new Context<UploadSession>(
+                odps,
+                DT_ENDPOINT,
+                projectName,
+                tableName,
+                partition,
+                -1,
+                columnDelimiter,
+                rowDelimiter,
+                threadNumber);
         context.setRecordCount(recordCount);
         RDTUploader uploader = new RDTUploader(context);
         uploader.upload(dataFilePathName);
         return;
       } catch (IOException e) {
         if (++retryTimes <= RETRY_MAX) {
-          LOG.error("write table encounter exception:" + e.getMessage() + ", retry times = "
-              + retryTimes);
+          LOG.error(
+              "write table encounter exception:"
+                  + e.getMessage()
+                  + ", retry times = "
+                  + retryTimes);
           try {
             Thread.sleep(5000);
           } catch (InterruptedException e1) {
@@ -183,8 +218,15 @@ public class ROdps {
   /*
    * *use tunnel sdk to load table from odps *
    */
-  public List<List<String>> loadTableFromDT(String projectName, String tableName, String partition,
-      String tempFile, String colDelimiter, String rowDelimiter, int limit, int threadNumber)
+  public List<List<String>> loadTableFromDT(
+      String projectName,
+      String tableName,
+      String partition,
+      String tempFile,
+      String colDelimiter,
+      String rowDelimiter,
+      int limit,
+      int threadNumber)
       throws ROdpsException {
 
     int retryTimes = 0;
@@ -198,14 +240,22 @@ public class ROdps {
           partition = formatPartition(partition, "", ",");
         }
         Context<DownloadSession> context =
-            new Context<DownloadSession>(odps, DT_ENDPOINT, projectName, tableName, partition,
-                limit, colDelimiter, rowDelimiter, threadNumber);
+            new Context<DownloadSession>(
+                odps,
+                DT_ENDPOINT,
+                projectName,
+                tableName,
+                partition,
+                limit,
+                colDelimiter,
+                rowDelimiter,
+                threadNumber);
         RDTDownloader downloader = new RDTDownloader(context);
         return downloader.downloadTable(tempFile);
       } catch (IOException e) {
         if (++retryTimes <= RETRY_MAX) {
-          LOG.error("load table encounter exception:" + e.getMessage() + ", retry times = "
-              + retryTimes);
+          LOG.error(
+              "load table encounter exception:" + e.getMessage() + ", retry times = " + retryTimes);
           e.printStackTrace();
           try {
             Thread.sleep(5000);
@@ -224,8 +274,8 @@ public class ROdps {
   /**
    * @throws OdpsException
    * @throws ROdpsException use project 命令
-   * @Title: useProject
-   * @Description: TODO
+   * @title: useProject
+   * @description: TODO
    * @param projectName
    * @return
    * @return boolean
@@ -241,12 +291,10 @@ public class ROdps {
     return true;
   }
 
-
-
   /**
    * @throws ROdpsException 将json转化成name:type的map
-   * @Title: createSchema
-   * @Description: TODO
+   * @title: createSchema
+   * @description: TODO
    * @param schemaJson
    * @return
    * @throws JSONException
@@ -262,7 +310,9 @@ public class ROdps {
         for (int i = 0; i < jsonArray.length(); i++) {
           JSONObject col = (JSONObject) (jsonArray.get(i));
           Schema schema =
-              new Schema(col.getString("name"), col.getString("type"),
+              new Schema(
+                  col.getString("name"),
+                  col.getString("type"),
                   (col.has("comment") ? col.getString("comment") : null));
           schema.setPartitionKey(type.equals("partitionKeys"));
           ret.put(col.getString("name"), schema);
@@ -277,16 +327,17 @@ public class ROdps {
 
   /**
    * @throws OdpsException 根据projectName创建Project对象
-   *
-   * @Title: getProjectObject
-   * @Description: TODO
+   * @title: getProjectObject
+   * @description: TODO
    * @param projectName
    * @return
    * @return Project
    * @throws
    */
   private Project getProjectObject(String projectName) throws OdpsException {
-    if (projectName == null || projectName.isEmpty() || projectName.equals(this.ODPS_PROJECT_NAME)) {
+    if (projectName == null
+        || projectName.isEmpty()
+        || projectName.equals(this.ODPS_PROJECT_NAME)) {
       Project p = odps.projects().get(ODPS_PROJECT_NAME);
       p.reload();
       return p;
@@ -300,16 +351,18 @@ public class ROdps {
 
   /**
    * 根据projectName是否为null返回projectName
-   * 
-   * @Title: getProjectName
-   * @Description: TODO
+   *
+   * @title: getProjectName
+   * @description: TODO
    * @param projectName
    * @return
    * @return String
    * @throws
    */
   public String getProjectName(String projectName) {
-    if (projectName == null || projectName.isEmpty() || projectName.equals(this.ODPS_PROJECT_NAME)) {
+    if (projectName == null
+        || projectName.isEmpty()
+        || projectName.equals(this.ODPS_PROJECT_NAME)) {
       return this.ODPS_PROJECT_NAME;
     } else {
       return projectName;
@@ -318,8 +371,8 @@ public class ROdps {
 
   /**
    * @throws ROdpsException
-   * @Title: getTableSize
-   * @Description: TODO
+   * @title: getTableSize
+   * @description: TODO
    * @param tableName
    * @return
    * @return int
@@ -335,8 +388,8 @@ public class ROdps {
    * @throws OdpsException
    * @throws ROdpsException
    * @throws CloneNotSupportedException
-   * @Title: DescribeTable
-   * @Description: TODO
+   * @title: DescribeTable
+   * @description: TODO
    * @param projectName
    * @param tableName
    * @return
@@ -355,8 +408,12 @@ public class ROdps {
       ps.add(this.createSingleValueFrame("owner", "String", tbl.getOwner()));
       ps.add(this.createSingleValueFrame("project", "String", tbl.getProject()));
       ps.add(this.createSingleValueFrame("comment", "String", tbl.getComment()));
-      ps.add(this.createSingleValueFrame("create_time", "DateTime", formatDateTime(tbl.getCreatedTime())));
-      ps.add(this.createSingleValueFrame("last_modified_time", "DateTime", formatDateTime(tbl.getLastMetaModifiedTime())));
+      ps.add(
+          this.createSingleValueFrame(
+              "create_time", "DateTime", formatDateTime(tbl.getCreatedTime())));
+      ps.add(
+          this.createSingleValueFrame(
+              "last_modified_time", "DateTime", formatDateTime(tbl.getLastMetaModifiedTime())));
       ps.add(this.createSingleValueFrame("is_internal_table", "boolean", tbl.isVirtualView()));
       if (tbl.isVirtualView()) {
         long size = tbl.getPhysicalSize();
@@ -406,8 +463,8 @@ public class ROdps {
   /**
    * @throws ROdpsException
    * @throws CloneNotSupportedException
-   * @Title: DropTable
-   * @Description: TODO
+   * @title: DropTable
+   * @description: TODO
    * @param projectName
    * @param tableName
    * @return
@@ -416,7 +473,8 @@ public class ROdps {
    */
   public boolean dropTable(String projectName, String tableName) throws ROdpsException {
     try {
-      this.runSqlTask("drop table " + getTableName(this.getProjectName(projectName), tableName) + ";");
+      this.runSqlTask(
+          "drop table " + getTableName(this.getProjectName(projectName), tableName) + ";");
       return true;
     } catch (Exception e) {
       LOG.error(e);
@@ -426,8 +484,8 @@ public class ROdps {
 
   /**
    * @throws ROdpsException
-   * @Title: isTableExist
-   * @Description: TODO
+   * @title: isTableExist
+   * @description: TODO
    * @param tableName
    * @return
    * @return boolean
@@ -462,11 +520,10 @@ public class ROdps {
   /**
    * 以Json字符串格式取得一个指定Table的Schema
    *
-   * @Title: getTableSchemaJson
-   * @Description: TODO
+   * @title: getTableSchemaJson
+   * @description: TODO
    * @param projectName
    * @param tableName
-   *
    */
   public String getTableSchemaJson(String projectName, String tableName) {
     String tableSchemaJson;
@@ -485,11 +542,10 @@ public class ROdps {
   /**
    * 通过列名获取该列在Table Schema中的Index
    *
-   * @Title: getIndexFromColName
-   * @Description: TODO
+   * @title: getIndexFromColName
+   * @description: TODO
    * @param colName
    * @param tableSchemaJson
-   *
    */
   public int getIndexFromColName(String colName, String tableSchemaJson) {
     if (0 >= tableSchemaJson.length()) {
@@ -511,17 +567,22 @@ public class ROdps {
     }
   }
 
+  public List<String> runSqlTask(String sql) throws ROdpsException {
+    return runSqlTask(sql, false);
+  }
+
   /**
    * @throws ROdpsException
    * @throws CloneNotSupportedException
-   * @Title: runSqlTask
-   * @Description: TODO
+   * @title: runSqlTask
+   * @description: TODO
    * @param sql
    * @return
    * @return List<DataFrameItem>
+   * @throws OdpsException
    * @throws
    */
-  public List<String> runSqlTask(String sql) throws ROdpsException {
+  public List<String> runSqlTask(String sql, boolean interactive) throws ROdpsException {
 
     // If the client forget to end with a semi-colon, append it.
     if (!sql.contains(";")) {
@@ -530,27 +591,46 @@ public class ROdps {
 
     LOG.debug("sql: " + sql);
 
+    // Create instance
+    Instance inst;
+    String taskName = "rodps_sql_task";
     try {
-      Instance instance = SQLTask.run(odps, odps.getDefaultProject(), sql, "rodps_sql_task", settings, null);
+      if (interactive) {
+        taskName = "rodps_mcqa_task";
+        SQLExecutorBuilder builder = SQLExecutorBuilder.builder();
+        SQLExecutor sqlExecutor = null;
+        sqlExecutor =
+            builder
+                .odps(odps)
+                .executeMode(ExecuteMode.INTERACTIVE)
+                .fallbackPolicy(FallbackPolicy.alwaysFallbackPolicy())
+                .build();
+        if (settings.containsKey("odps.sql.submit.mode")) {
+          settings.put("odps.sql.submit.mode", "script");
+        }
+        sqlExecutor.run(sql, settings);
+        inst = sqlExecutor.getInstance();
+      } else {
+        inst = SQLTask.run(odps, odps.getDefaultProject(), sql, taskName, settings, null);
+      }
+
       LogView logView = new LogView(odps);
       if (LOGVIEW_HOST != null) {
         logView.setLogViewHost(LOGVIEW_HOST);
       }
-      String logViewUrl = logView.generateLogView(instance, 7 * 24);
+      String logViewUrl = logView.generateLogView(inst, 7 * 24);
       System.err.println(logViewUrl);
       LOG.info(logViewUrl);
-      instance.waitForSuccess();
-      Map<String, String> results = instance.getTaskResults();
-      String result = results.get("rodps_sql_task");
-      if (result == null||result.isEmpty()) {
+
+      inst.waitForSuccess();
+      Map<String, String> results = inst.getTaskResults();
+      String result = results.get(taskName);
+      if (result == null || result.isEmpty()) {
         return new ArrayList<String>();
       }
-      return new ArrayList<String>(
-        Arrays.asList(results.get("rodps_sql_task").split("\n")));
-    }
-
-    catch (Exception e) {
-      LOG.error("runSqlTask error,sql=" + sql, e);
+      return new ArrayList<String>(Arrays.asList(results.get(taskName).split("\n")));
+    } catch (Exception e) {
+      LOG.error("runSqlTask error, sql=" + sql, e);
       throw new ROdpsException(e);
     }
   }
@@ -622,8 +702,8 @@ public class ROdps {
   /**
    * @throws ROdpsException
    * @throws CloneNotSupportedException
-   * @Title: getTables
-   * @Description: TODO
+   * @title: getTables
+   * @description: TODO
    * @return
    * @return List<String>
    * @throws
@@ -638,7 +718,7 @@ public class ROdps {
     TableFilter filter = new TableFilter();
     filter.setName(pattern);
 
-    for (Iterator<Table> it = odps.tables().iterator(projectName, filter); it.hasNext();) {
+    for (Iterator<Table> it = odps.tables().iterator(projectName, filter); it.hasNext(); ) {
       Table tb = it.next();
       owner.getData().add(tb.getOwner());
       tableName.getData().add(tb.getName());
@@ -654,8 +734,8 @@ public class ROdps {
 
   /**
    * @throws ROdpsException 解析partition
-   * @Title: parsePartition
-   * @Description: TODO
+   * @title: parsePartition
+   * @description: TODO
    * @param part
    * @return
    * @return LinkedHashMap<String,String>
@@ -669,8 +749,8 @@ public class ROdps {
       if (kv.length != 2) {
         throw new ROdpsException("Partition expression error:" + part);
       }
-      if (kv[1].startsWith("'") && kv[1].endsWith("'") || kv[1].startsWith("\"")
-          && kv[1].endsWith("\"")) {
+      if (kv[1].startsWith("'") && kv[1].endsWith("'")
+          || kv[1].startsWith("\"") && kv[1].endsWith("\"")) {
         kv[1] = kv[1].substring(1, kv[1].length() - 1);
       }
       ret.put(kv[0], kv[1]);
@@ -679,9 +759,8 @@ public class ROdps {
   }
 
   /**
-   * 
-   * @Title: partitionMap2String
-   * @Description: TODO
+   * @title: partitionMap2String
+   * @description: TODO
    * @param sepc
    * @param valueDim 值的分隔符
    * @param fieldDim　字段间的分隔符
@@ -689,8 +768,8 @@ public class ROdps {
    * @return String
    * @throws
    */
-  private static String partitionMap2String(Map<String, String> sepc, String valueDim,
-      String fieldDim) {
+  private static String partitionMap2String(
+      Map<String, String> sepc, String valueDim, String fieldDim) {
     StringBuffer ret = new StringBuffer();
     for (Map.Entry<String, String> entry : sepc.entrySet()) {
       if (ret.length() > 0) {

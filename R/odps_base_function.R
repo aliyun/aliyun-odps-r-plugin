@@ -55,7 +55,7 @@ rodps.unset <- function(key) {
     odpsOperator$unset(key)
 }
 
-.rodps.bigSql <- function(query, memsize = 10737518240) {
+.rodps.bigSql <- function(query, memsize = 10737518240, interactive = FALSE) {
     .check.init()
     if (is.null(query) || query == "") {
         stop(error("input_query_error", "query is null"))
@@ -65,7 +65,7 @@ rodps.unset <- function(key) {
     query <- paste("CREATE TABLE ", tmptable, " LIFECYCLE 3 AS ", query, sep = "")
 
 
-    odpsOperator$runSqlTask(query)
+    odpsOperator$runSqlTask(query, interactive)
     length <- rodps.table.size(tmptable)
 
 
@@ -75,7 +75,7 @@ rodps.unset <- function(key) {
         return(x)
     } else {
         result <- try(rodps.table.read(tmptable, memsize = memsize))
-        odpsOperator$runSqlTask(paste("DROP TABLE ", tmptable, sep = ""))
+        odpsOperator$runSqlTask(paste("DROP TABLE ", tmptable, sep = ""), interactive)
         if ("try-error" == class(result)) {
             stop(paste("Exception ocurred when loading table:", tmptable, sep = ""))
         } else {
@@ -96,7 +96,7 @@ rodps.unset <- function(key) {
 #' ## select the data of 'sales' in January ,and store the result in data.frame
 #' \dontrun{ data <- rodps.sql('select * from sales where month=1')}
 #' @export
-rodps.sql <- function(query) {
+rodps.sql <- function(query, interactive = FALSE) {
     .check.init()
     if (is.null(query) || query == "") {
         stop(error("input_query_error", "query is null"))
@@ -120,7 +120,7 @@ rodps.sql <- function(query) {
             query <- query_1[[1]][1]
         }
         if (nchar(query_2) > 0) {
-            odpsOperator$runSqlTask(query_2[[1]])
+            odpsOperator$runSqlTask(query_2[[1]], interactive)
         }
         if (nchar(query) < 1) {
             return(TRUE)
@@ -129,9 +129,9 @@ rodps.sql <- function(query) {
 
 
     if (type == "select") {
-        return(.rodps.bigSql(query))
+        return(.rodps.bigSql(query, interactive))
     }
-    ret <- odpsOperator$runSqlTask(query)
+    ret <- odpsOperator$runSqlTask(query, interactive)
     if (ret == NULL || ret$size() == 0) {
         return(NULL)
     }
