@@ -1,34 +1,59 @@
 #!/bin/bash
-basepath=$(cd "$(dirname "$0")";pwd)
+basepath=$(
+    cd "$(dirname "$0")"
+    pwd
+)
 
-RVERSION=2.1.6
+RVERSION=2.1.5
 VERSIONDATE=$(date +"%Y-%m-%d %H:%M:%S")
 
+# Constants for colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
-function WARN {
-    printf "${YELLOW}[%s] %s${NC}\n" "$(date '+%Y-%m-%dT%H:%M:%S')" "$@"
+function print_message {
+    local color=$1
+    shift
+    printf "${color}[%s] %s${NC}\n" "$(date '+%Y-%m-%dT%H:%M:%S')" "$@"
 }
 
 function INFO {
-    printf "${GREEN}[%s] %s${NC}\n" "$(date '+%Y-%m-%dT%H:%M:%S')" "$@"
+    print_message "$GREEN" "$@"
+}
+
+function WARN {
+    print_message "$YELLOW" "$@"
 }
 
 function ERROR {
-    printf "${RED}[%s] %s${NC}\n" "$(date '+%Y-%m-%dT%H:%M:%S')" "$@"
+    print_message "$RED" "$@"
 }
 
-function checkcmd {
-    command -v $1 1>/dev/null 2>&1
-    return $?
+# Check for Java and Maven dependencies
+function check_dependencies {
+    local missing_deps=()
+
+    command -v java >/dev/null 2>&1 || missing_deps+=("Java")
+    command -v mvn >/dev/null 2>&1 || missing_deps+=("Maven")
+
+    if [ ${#missing_deps[@]} -gt 0 ]; then
+        ERROR "Missing dependencies: ${missing_deps[*]}"
+        exit 1
+    fi
 }
+
+# Check sed command compatibility
+SED_CMD="sed -i"
+if sed -i '' /dev/null 2>/dev/null; then
+    SED_CMD="sed -i ''"
+fi
 
 INFO "Configuring RODPS package, version ${RVERSION}..."
 
-sed -i '' -E "s|Version: .*|Version: ${RVERSION}|g" $basepath/DESCRIPTION
+# Update description version
+$SED_CMD -E "s|Version: .*|Version: ${RVERSION}|g" "$basepath/DESCRIPTION"
 
 cat >$basepath/R/odps_version.R <<__EOF__
 rodps.version <- function() {
@@ -38,7 +63,7 @@ rodps.version <- function() {
 __EOF__
 
 function build_java_src {
-    INFO "Building Java dependency located at $basepath/java"
+    INFO "Building Java lib located at $basepath/java"
 
     libpath=${basepath}/inst/java
     if [ -e ${libpath} ]; then rm -rf $libpath; fi
@@ -61,14 +86,7 @@ function build_java_src {
 }
 
 function check_java_building_env {
-    if ! checkcmd java; then
-        WARN "Java executable not found"
-        return 1
-    fi
-    if ! checkcmd mvn; then
-        WARN "Maven executable (mvn) not found"
-        return 1
-    fi
+    check_dependencies
 
     java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
     java_major_version=$(echo "$java_version" | awk -F '.' '{print $1}')
@@ -79,18 +97,11 @@ function check_java_building_env {
     INFO "Maven version: ${maven_version}"
 }
 
-function check_java_lib {
-    local targetJar="rodps-${RVERSION}.jar"
-    if [ ! -e "$basepath/inst/java/${targetJar}" ]; then
-        if ! check_java_building_env; then
-            return 1
-        fi
-    else
-        INFO "Java dependency lib found at $targetJar"
-    fi
-}
-
-if ! check_java_lib; then
-    WARN "Java dependency not found in 'inst/java', try to run local building."
+targetJar="rodps-${RVERSION}.jar"
+if [ ! -e "$basepath/inst/java/${targetJar}" ]; then
+    WARN "Java lib not found in 'inst/java', try to run local building."
+    check_java_building_env
     build_java_src
+else
+    INFO "Java lib found at $targetJar"
 fi

@@ -1,5 +1,5 @@
 Package: RODPS
-Version: 2.1.6
+Version: 2.1.5
 Title: R interface to interact with MaxCompute/ODPS
 Description: This package is developed for R to interact with
     MaxCompute/ODPS, the platform of Alibaba to process big data.
