@@ -79,7 +79,7 @@ public class ROdps {
       String dtEndpoint,
       String logviewHost,
       String log4j_properties)
-      throws ROdpsException, OdpsException {
+      throws ROdpsException {
     this(projectName, accessID, accessKey, "", endPoint, dtEndpoint, logviewHost, log4j_properties);
   }
 
@@ -92,7 +92,7 @@ public class ROdps {
       String dtEndpoint,
       String logviewHost,
       String log4j_properties)
-      throws ROdpsException, OdpsException {
+      throws ROdpsException {
 
     if (log4j_properties == null || log4j_properties.isEmpty())
       LOG = LogFactory.getLog(ROdps.class);
@@ -272,16 +272,13 @@ public class ROdps {
   }
 
   /**
-   * @throws OdpsException
-   * @throws ROdpsException use project 命令
-   * @title: useProject
-   * @description: TODO
+   * @title: Use Project
+   * @description: use project 命令
    * @param projectName
-   * @return
    * @return boolean
-   * @throws
+   * @throws ROdpsException
    */
-  public boolean useProject(String projectName) throws ROdpsException, OdpsException {
+  public boolean useProject(String projectName) throws ROdpsException {
     if (projectName == null) {
       throw new ROdpsException("ProjectName is null");
     }
@@ -292,14 +289,12 @@ public class ROdps {
   }
 
   /**
-   * @throws ROdpsException 将json转化成name:type的map
    * @title: createSchema
-   * @description: TODO
+   * @description: 将json转化成name:type的map
    * @param schemaJson
-   * @return
-   * @throws JSONException
-   * @return Map<String,String>
-   * @throws
+   * @param type
+   * @throws ROdpsException
+   * @return Map<String,Schema>
    */
   private Map<String, Schema> createSchema(String schemaJson, String type) throws ROdpsException {
     Map<String, Schema> ret = new LinkedHashMap<String, Schema>();
@@ -326,13 +321,11 @@ public class ROdps {
   }
 
   /**
-   * @throws OdpsException 根据projectName创建Project对象
-   * @title: getProjectObject
-   * @description: TODO
+   * @title: Get Project Object
+   * @description: 根据projectName创建Project对象
    * @param projectName
-   * @return
    * @return Project
-   * @throws
+   * @throws OdpsException
    */
   private Project getProjectObject(String projectName) throws OdpsException {
     if (projectName == null
@@ -350,14 +343,10 @@ public class ROdps {
   }
 
   /**
-   * 根据projectName是否为null返回projectName
-   *
    * @title: getProjectName
-   * @description: TODO
+   * @description: 根据projectName是否为null返回projectName
    * @param projectName
-   * @return
    * @return String
-   * @throws
    */
   public String getProjectName(String projectName) {
     if (projectName == null
@@ -370,34 +359,29 @@ public class ROdps {
   }
 
   /**
-   * @throws ROdpsException
    * @title: getTableSize
-   * @description: TODO
+   * @description: Get table size in bytes
    * @param tableName
-   * @return
-   * @return int
-   * @throws
+   * @return long
+   * @throws ROdpsException
    */
-  public long getTableSize(String projectName, String tableName, String partition)
-      throws ROdpsException {
+  public long getTableSize(String projectName, String tableName, String partition) {
     Table tbl = odps.tables().get(this.getProjectName(projectName), tableName);
     return tbl.getSize();
   }
 
   /**
-   * @throws OdpsException
-   * @throws ROdpsException
-   * @throws CloneNotSupportedException
    * @title: DescribeTable
    * @description: TODO
    * @param projectName
    * @param tableName
-   * @return
-   * @return String
-   * @throws
+   * @param partition
+   * @return List<DataFrameItem>
+   * @throws ROdpsException
+   * @throws CloneNotSupportedException
    */
   public List<DataFrameItem> describeTable(String projectName, String tableName, String partition)
-      throws ROdpsException, OdpsException {
+      throws ROdpsException {
     Table tbl = odps.tables().get(this.getProjectName(projectName), tableName);
     List<DataFrameItem> ps = new ArrayList<DataFrameItem>();
     if (partition != null) {
@@ -461,15 +445,11 @@ public class ROdps {
   }
 
   /**
-   * @throws ROdpsException
-   * @throws CloneNotSupportedException
    * @title: DropTable
-   * @description: TODO
    * @param projectName
    * @param tableName
-   * @return
    * @return boolean
-   * @throws
+   * @throws ROdpsException
    */
   public boolean dropTable(String projectName, String tableName) throws ROdpsException {
     try {
@@ -483,13 +463,10 @@ public class ROdps {
   }
 
   /**
-   * @throws ROdpsException
    * @title: isTableExist
-   * @description: TODO
    * @param tableName
-   * @return
    * @return boolean
-   * @throws
+   * @throws ROdpsException
    */
   public boolean isTableExist(String projectName, String tableName, String partition)
       throws ROdpsException {
@@ -518,10 +495,8 @@ public class ROdps {
   }
 
   /**
-   * 以Json字符串格式取得一个指定Table的Schema
-   *
    * @title: getTableSchemaJson
-   * @description: TODO
+   * @description: 以Json字符串格式取得一个指定Table的Schema
    * @param projectName
    * @param tableName
    */
@@ -540,10 +515,8 @@ public class ROdps {
   }
 
   /**
-   * 通过列名获取该列在Table Schema中的Index
-   *
    * @title: getIndexFromColName
-   * @description: TODO
+   * @description: 通过列名获取该列在Table Schema中的Index
    * @param colName
    * @param tableSchemaJson
    */
@@ -572,19 +545,15 @@ public class ROdps {
   }
 
   /**
-   * @throws ROdpsException
-   * @throws CloneNotSupportedException
    * @title: runSqlTask
    * @description: TODO
-   * @param sql
-   * @return
-   * @return List<DataFrameItem>
-   * @throws OdpsException
-   * @throws
+   * @param sql The SQL string
+   * @param interactive enable interactive (MCQA) or not
+   * @return List<String>
+   * @throws ROdpsException
    */
   public List<String> runSqlTask(String sql, boolean interactive) throws ROdpsException {
-
-    // If the client forget to end with a semi-colon, append it.
+    // If the client forgets to end with a semicolon, append it.
     if (!sql.contains(";")) {
       sql += ";";
     }
@@ -593,10 +562,10 @@ public class ROdps {
 
     // Create instance
     Instance inst;
-    String taskName = "rodps_sql_task";
+    String TASK_NAME = "rodps_sql_task";
     try {
       if (interactive) {
-        taskName = "rodps_mcqa_task";
+        TASK_NAME = "rodps_mcqa_task";
         SQLExecutorBuilder builder = SQLExecutorBuilder.builder();
         SQLExecutor sqlExecutor = null;
         sqlExecutor =
@@ -611,7 +580,7 @@ public class ROdps {
         sqlExecutor.run(sql, settings);
         inst = sqlExecutor.getInstance();
       } else {
-        inst = SQLTask.run(odps, odps.getDefaultProject(), sql, taskName, settings, null);
+        inst = SQLTask.run(odps, odps.getDefaultProject(), sql, TASK_NAME, settings, null);
       }
 
       LogView logView = new LogView(odps);
@@ -624,11 +593,11 @@ public class ROdps {
 
       inst.waitForSuccess();
       Map<String, String> results = inst.getTaskResults();
-      String result = results.get(taskName);
+      String result = results.get(TASK_NAME);
       if (result == null || result.isEmpty()) {
         return new ArrayList<String>();
       }
-      return new ArrayList<String>(Arrays.asList(results.get(taskName).split("\n")));
+      return new ArrayList<String>(Arrays.asList(results.get(TASK_NAME).split("\n")));
     } catch (Exception e) {
       LOG.error("runSqlTask error, sql=" + sql, e);
       throw new ROdpsException(e);
@@ -700,15 +669,10 @@ public class ROdps {
   }
 
   /**
-   * @throws ROdpsException
-   * @throws CloneNotSupportedException
    * @title: getTables
-   * @description: TODO
-   * @return
-   * @return List<String>
-   * @throws
+   * @return List<DataFrameItem>
    */
-  public List<DataFrameItem> getTables(String projectName, String pattern) throws ROdpsException {
+  public List<DataFrameItem> getTables(String projectName, String pattern) {
     DataFrameItem<String> owner = new DataFrameItem<String>("owner", "string");
     DataFrameItem<String> tableName = new DataFrameItem<String>("table_name", "string");
     List<DataFrameItem> data = new ArrayList<DataFrameItem>();
@@ -733,13 +697,11 @@ public class ROdps {
   }
 
   /**
-   * @throws ROdpsException 解析partition
    * @title: parsePartition
-   * @description: TODO
+   * @description: 解析partition
    * @param part
-   * @return
    * @return LinkedHashMap<String,String>
-   * @throws
+   * @throws ROdpsException
    */
   private static LinkedHashMap<String, String> parsePartition(String part) throws ROdpsException {
     LinkedHashMap<String, String> ret = new LinkedHashMap<String, String>();
@@ -761,17 +723,15 @@ public class ROdps {
   /**
    * @title: partitionMap2String
    * @description: TODO
-   * @param sepc
+   * @param spec PartitionSpec
    * @param valueDim 值的分隔符
    * @param fieldDim　字段间的分隔符
-   * @return
    * @return String
-   * @throws
    */
   private static String partitionMap2String(
-      Map<String, String> sepc, String valueDim, String fieldDim) {
+      Map<String, String> spec, String valueDim, String fieldDim) {
     StringBuffer ret = new StringBuffer();
-    for (Map.Entry<String, String> entry : sepc.entrySet()) {
+    for (Map.Entry<String, String> entry : spec.entrySet()) {
       if (ret.length() > 0) {
         ret.append(fieldDim);
       }
@@ -780,10 +740,11 @@ public class ROdps {
     return ret.toString();
   }
 
-  /*
-   * *set log path*
+  /**
+   * @title: setLogPath
+   * @description: set log path
    */
-  public boolean setLogPath(String log_path) throws IOException {
+  public boolean setLogPath(String log_path) {
     String fileName = ROdps.class.getClassLoader().getResource("log4j.properties").getPath();
     String mode = "loghome";
     File file = new File(fileName);
