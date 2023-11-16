@@ -1,5 +1,5 @@
 #' @name rodps.table
-#' @title Table functions
+#' @title RODPS Table Functions
 #' @description Provide functions to operate table.
 #' @author \email{yunyuan.zhangyy@alibaba-inc.com}
 #' @seealso \code{\link{rodps.table.desc}}, \code{\link{rodps.table.drop}},
@@ -9,12 +9,49 @@
 #' \code{\link{rodps.table.write}}
 NULL
 
+#' Table Head
+#' 
+#' Create odps.data and odps.vector in S4.
+#' Store the head result in a temp table
+#'
+#' @export
+head.rodps.data <- function(rd, n = 6L) {
+    rodps.table.head(rd@tbl, n)
+}
+
+#' Table Head
+#'
+#' Show a few of head rows of table.
+#'
+#' @param tbl Table name
+#' @param n The number of head rows
 #' @export
 rodps.table.head <- function(tbl, n = 6L) {
     # could be optimized by identify the tbl/partiton tbl/view
     sql <- sprintf("select * from %s limit %d;", tbl, n)
     df <- rodps.sql(sql)
     df
+}
+
+#' Split full table name into table name and project name
+#' @param ftn Full table name.
+#' @export
+rodps.split.ftn <- function(ftn) {
+    if (is.null(ftn) || !is.character(ftn) || nchar(ftn) == 0 || length(ftn) > 1) {
+        stop("Invalid table name ")
+    }
+    p.t <- unlist(strsplit(ftn, "[.]"))
+    if (length(p.t) > 2 || length(p.t) < 1) {
+        stop("Invalid table name ")
+    }
+    ret <- list()
+    if (length(p.t) == 1) {
+        ret$tablename <- p.t[1]
+    } else {
+        ret$projectname <- p.t[1]
+        ret$tablename <- p.t[2]
+    }
+    return(ret)
 }
 
 #' Table Existence
@@ -48,11 +85,12 @@ rodps.table.exist <- function(full.tablename, partition = NULL) {
 }
 
 #' @rdname rodps.table.exist
+#' @export
 rodps.exist.table <- rodps.table.exist
 
 #' List Tables
 #'
-#' List tables in the project, default in current project.
+#' List all tables in the project, default in current project.
 #'
 #' @param pattern Partition pattern, use '*' or specific PartitionName.
 #' @param projectname Specific project to query,default is current project.
@@ -82,14 +120,16 @@ rodps.table.list <- function(pattern = NULL, projectname = NULL) {
 }
 
 #' @rdname rodps.table.list
+#' @export
 rodps.list.table <- rodps.table.list
 
 #' @rdname rodps.table.list
+#' @export
 rodps.list.tables <- rodps.table.list
 
 #' List Partitions
 #'
-#' List partitions of table, ERROR if the table has no partition.
+#' List partitions of a table. Raise ERROR if the table has no partition.
 #'
 #' @param full.tablename, Table name, in format of 'ProjectName.TableName' or
 #'   'TableName' (using current project).
@@ -109,6 +149,7 @@ rodps.table.partitions <- function(full.tablename) {
 }
 
 #' @rdname rodps.table.partitions
+#' @export
 rodps.partitions.table <- rodps.table.partitions
 
 #' Drop Table
@@ -148,6 +189,7 @@ rodps.table.drop <- function(full.tablename, partition = NULL) {
 }
 
 #' @rdname rodps.table.drop
+#' @export
 rodps.drop.table <- rodps.table.drop
 
 #' Convert pt|string| into dataframe
@@ -172,8 +214,8 @@ rodps.drop.table <- rodps.table.drop
 
 #' Table Description
 #'
-#' Show description of table, include
-#' Owner,Project,Comment,Create_time,Last_modified_time,Size,Columns.
+#' Show description of a table, including metadata of 
+#' Owner, Project, Comment, Create_time, Last_modified_time, Size, Columns.
 #'
 #' @param full.tablename Table name, in format 'ProjectName.TableName',or
 #'   'TableName' (using current project).
@@ -213,12 +255,13 @@ rodps.table.desc <- function(full.tablename, partition = NULL) {
 }
 
 #' @rdname rodps.table.desc
+#' @export
 rodps.desc.table <- rodps.table.desc
 
 #' Table Size
 #'
-#' Get the size of table, unit is Byte.
-#' 
+#' Get the size of table in Bytes.
+#'
 #' @param full.tablename Table name, in format 'ProjectName.TableName',or
 #'   'TableName' (using current project).
 #' @param partition Partition spec
@@ -242,10 +285,10 @@ rodps.table.size <- function(full.tablename, partition = NULL) {
         partition)
 
     return(size)
-
 }
 
 #' @rdname rodps.table.size
+#' @export
 rodps.size.table <- rodps.table.size
 
 #' @noRd
@@ -379,11 +422,12 @@ rodps.table.write <- function(dataframe, full.tablename, partition = NULL, table
 }
 
 #' @rdname rodps.table.write
+#' @export
 rodps.write.table <- rodps.table.write
 
 #' Reading Table
 #'
-#' Read data from ODPS and store in R data format.
+#' Read data from ODPS and store in R data frame.
 #'
 #' @param full.tablename Table name
 #' @param partition Partition spec
@@ -433,12 +477,61 @@ rodps.table.read <- function(full.tablename, partition = NULL, limit = -1, memsi
 }
 
 #' @rdname rodps.table.read
+#' @export
 rodps.read.table <- rodps.table.read
 
 #' @rdname rodps.table.read
+#' @export
 rodps.load.table <- rodps.table.read
 
+#' Table Rows
+#'
+#' Get the number of rows in a table.
+#'
+#' @param full.tablename Table name , in format of 'ProjectName.TableName' or
+#'   'TableName' (using current project)
+#' @param partition Partition spec.
+#' @author \email{yunyuan.zhangyy@alibaba-inc.com}
+#' @examples
+#' ## get the number of rows
+#' \dontrun{rodps.table.rows('sales')}
+#' @seealso   \code{\link{rodps.table.desc}}, \code{\link{rodps.table.drop}},
+#'   \code{\link{rodps.table.exist}}, \code{\link{rodps.table.partitions}},
+#'   \code{\link{rodps.table.list}}, \code{\link{rodps.table.size}},
+#'   \code{\link{rodps.table.read}}, \code{\link{rodps.table.write}}
+#' @export
+rodps.table.rows <- function(full.tablename, partition = NULL) {
+    .check.init()
+    p.t <- rodps.split.ftn(full.tablename)
+    projectname <- p.t$projectname
+    tablename <- p.t$tablename
+
+    .check.tablename(tablename)
+    sz <- rodps.table.size(full.tablename)
+
+    if (sz < 10 * 1024 * 1024 * 1024 || !is.null(partition) && partition != "") {
+        sql <- sprintf(" count %s ", full.tablename)
+        if (!is.null(partition) && partition != "") {
+            sql <- paste(sql, "partition(", partition, ")")
+        }
+        v <- rodps.sql(sql)
+        ret <- as.numeric(v[[1]])
+    } else {
+        sql <- sprintf("select count(*) from %s", full.tablename)
+        v <- rodps.sql(sql)
+        ret <- as.numeric(v[1, 1])
+    }
+    return(ret)
+}
+
+#' @rdname rodps.table.rows
+#' @export
+rodps.rows.table <- rodps.table.rows
+
 #' Sample table
+#'
+#' @seealso \code{\link{rodps.table.sample.strat}}
+#' @export
 rodps.table.sample.srs <- function(srctable, tgttable, samplerate, cond = NULL, select = NULL) {
     rv <- round(runif(3) * 100)
 
@@ -456,7 +549,6 @@ rodps.table.sample.srs <- function(srctable, tgttable, samplerate, cond = NULL, 
         }
         sel = paste(select, sep = ",", collapse = ",")
     }
-
 
     if (!rodps.table.exist(srctable)) {
         stop(paste("Table not exists ", srctable))
@@ -485,6 +577,7 @@ rodps.table.sample.srs <- function(srctable, tgttable, samplerate, cond = NULL, 
         sql <- paste(" CREATE TABLE ", tgttable, " AS  \n SELECT * FROM ( ", sql,
             distby, " ) sub \n LIMIT ", samplerate)
     }
+
     ret <- try(rodps.sql(sql))
     if ("try-error" %in% class(ret)) {
         cat("Exception occurred when executing sql \n")
@@ -495,12 +588,21 @@ rodps.table.sample.srs <- function(srctable, tgttable, samplerate, cond = NULL, 
     return(T)
 }
 
+#' @rdname rodps.table.sample.srs
+#' @export
 rodps.sample.srs <- rodps.table.sample.srs
 
-#' 分层抽样 select abc from ( *, row_number() over( partition by g order by
+#' Sample Table
+#'
+#' The sample strategy is as similar as:
+#'
+#' select abc from ( *, row_number() over( partition by g order by
 #' rand()) r_rn, rand() as r_select ) sub
 #' 1. by percent sub where r_select < rate
-#' 2. by_number sub where rn <= rate
+#' 2. by number sub where rn <= rate
+#'
+#' @seealso \code{\link{rodps.table.sample.srs}}
+#' @export
 rodps.table.sample.strat <- function(srctable, tgttable, samplerate, strat, select = NULL) {
     .check.tablename(srctable)
     .check.tablename(tgttable)
@@ -543,49 +645,8 @@ rodps.table.sample.strat <- function(srctable, tgttable, samplerate, strat, sele
         cat("\n")
     }
     return(TRUE)
-
 }
-rodps.sample.strat <- rodps.table.sample.strat
 
-#' Table Rows
-#'
-#' Get the number of rows
-#'
-#' @param full.tablename Table name , in format of 'ProjectName.TableName' or
-#'   'TableName' (using current project)
-#' @param partition Partition spec.
-#' @author \email{yunyuan.zhangyy@alibaba-inc.com}
-#' @examples
-#' ## get the number of rows
-#' \dontrun{rodps.table.rows('sales')}
-#' @seealso   \code{\link{rodps.table.desc}}, \code{\link{rodps.table.drop}},
-#'   \code{\link{rodps.table.exist}}, \code{\link{rodps.table.partitions}},
-#'   \code{\link{rodps.table.list}}, \code{\link{rodps.table.size}},
-#'   \code{\link{rodps.table.read}}, \code{\link{rodps.table.write}}
+#' @rdname rodps.table.sample.strat
 #' @export
-rodps.table.rows <- function(full.tablename, partition = NULL) {
-    .check.init()
-    p.t <- rodps.split.ftn(full.tablename)
-    projectname <- p.t$projectname
-    tablename <- p.t$tablename
-
-    .check.tablename(tablename)
-    sz <- rodps.table.size(full.tablename)
-
-    if (sz < 10 * 1024 * 1024 * 1024 || !is.null(partition) && partition != "") {
-        sql <- sprintf(" count %s ", full.tablename)
-        if (!is.null(partition) && partition != "") {
-            sql <- paste(sql, "partition(", partition, ")")
-        }
-        v <- rodps.sql(sql)
-        ret <- as.numeric(v[[1]])
-    } else {
-        sql <- sprintf("select count(*) from %s", full.tablename)
-        v <- rodps.sql(sql)
-        ret <- as.numeric(v[1, 1])
-    }
-    return(ret)
-}
-
-#' @rdname rodps.table.rows
-rodps.rows.table <- rodps.table.rows
+rodps.sample.strat <- rodps.table.sample.strat

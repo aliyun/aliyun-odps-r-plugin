@@ -16,8 +16,8 @@ rodps.desc.table(full.tablename, partition = NULL)
 \item{partition}{Partition spec}
 }
 \description{
-Show description of table, include
-Owner,Project,Comment,Create_time,Last_modified_time,Size,Columns.
+Show description of a table, including metadata of 
+Owner, Project, Comment, Create_time, Last_modified_time, Size, Columns.
 }
 \examples{
 ## show description of 'dual'

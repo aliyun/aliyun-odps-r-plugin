@@ -16,7 +16,7 @@ rodps.size.table(full.tablename, partition = NULL)
 \item{partition}{Partition spec}
 }
 \description{
-Get the size of table, unit is Byte.
+Get the size of table in Bytes.
 }
 \examples{
 ## get the size of 'sales'

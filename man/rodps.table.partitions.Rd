@@ -14,7 +14,7 @@ rodps.partitions.table(full.tablename)
 'TableName' (using current project).}
 }
 \description{
-List partitions of table, ERROR if the table has no partition.
+List partitions of a table. Raise ERROR if the table has no partition.
 }
 \examples{
 ## list partitions of 'sales'

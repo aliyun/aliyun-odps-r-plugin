@@ -15,7 +15,7 @@ rodps.exist.table(full.tablename, partition = NULL)
 \item{partition}{partition spec, default NULL.}
 }
 \description{
-Query whether the table exists.
+Check whether a table exists.
 }
 \examples{
 \dontrun{rodps.table.exist('mytable')}

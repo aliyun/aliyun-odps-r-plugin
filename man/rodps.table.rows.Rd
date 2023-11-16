@@ -16,7 +16,7 @@ rodps.rows.table(full.tablename, partition = NULL)
 \item{partition}{Partition spec.}
 }
 \description{
-Get the number of rows
+Get the number of rows in a table.
 }
 \examples{
 ## get the number of rows

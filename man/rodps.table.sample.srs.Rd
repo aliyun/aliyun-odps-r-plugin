@@ -2,6 +2,7 @@
 % Please edit documentation in R/rodps_table.R
 \name{rodps.table.sample.srs}
 \alias{rodps.table.sample.srs}
+\alias{rodps.sample.srs}
 \title{Sample table}
 \usage{
 rodps.table.sample.srs(
@@ -11,7 +12,12 @@ rodps.table.sample.srs(
   cond = NULL,
   select = NULL
 )
+
+rodps.sample.srs(srctable, tgttable, samplerate, cond = NULL, select = NULL)
 }
 \description{
 Sample table
+}
+\seealso{
+\code{\link{rodps.table.sample.strat}}
 }

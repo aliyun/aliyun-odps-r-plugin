@@ -47,7 +47,7 @@ rodps.load.table(
 \item{thread}{Thread number.}
 }
 \description{
-Read data from ODPS and store in R data format.
+Read data from ODPS and store in R data frame.
 }
 \examples{
 ## show description of 'dual'

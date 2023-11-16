@@ -2,12 +2,15 @@
 % Please edit documentation in R/rodps_project.R
 \name{rodps.project.current}
 \alias{rodps.project.current}
-\title{Get current project name.}
+\alias{rodps.current.project}
+\title{Show current project name.}
 \usage{
 rodps.project.current()
+
+rodps.current.project()
 }
 \description{
-Get current project name.
+Show current project name.
 }
 \examples{
 ## get current project name

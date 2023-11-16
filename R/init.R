@@ -218,16 +218,19 @@ error <- function(error_name, msg = NULL) {
 }
 
 #' @rdname error
+#' @export
 fatal <- function(error_name, msg = NULL) {
     print(geterror(error_name, msg))
 }
 
 #' @rdname error
+#' @export
 info <- function(error_name, msg = NULL) {
     print(geterror(error_name, msg))
 }
 
 #' @rdname error
+#' @export
 warn <- function(error_name, msg = NULL) {
     print(geterror(error_name, msg))
 }

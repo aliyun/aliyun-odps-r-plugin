@@ -37,4 +37,5 @@ rodps.project.current <- function() {
 }
 
 #' @rdname rodps.project.current
+#' @export
 rodps.current.project <- rodps.project.current

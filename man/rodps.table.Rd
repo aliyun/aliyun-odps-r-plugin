@@ -2,7 +2,7 @@
 % Please edit documentation in R/rodps_table.R
 \name{rodps.table}
 \alias{rodps.table}
-\title{Table functions}
+\title{RODPS Table Functions}
 \description{
 Provide functions to operate table.
 }

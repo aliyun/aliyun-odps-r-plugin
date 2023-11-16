@@ -18,7 +18,7 @@ rodps.list.tables(pattern = NULL, projectname = NULL)
 \item{projectname}{Specific project to query,default is current project.}
 }
 \description{
-List tables in the project, default in current project.
+List all tables in the project, default in current project.
 }
 \examples{
 ##list the tables in current project

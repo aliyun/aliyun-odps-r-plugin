@@ -167,7 +167,6 @@ rodps.predict.fda <- function(object, srctbl, tgttbl, type = "class", prior, dim
     }
     means <- means[, seq(dimension), drop = FALSE]
 
-
     prior <- 2 * log(prior)
     dist_list = c()
     for (i in seq(1:nrow(means))) {

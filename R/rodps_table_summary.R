@@ -5,8 +5,9 @@ summary.rodps.data <- function(rd) {
     rodps.table.summary(rd@tbl)
 }
 
-#' Export table summary
-#' 
+#' Table Summary
+#'
+#' Get statistical summaries of a table.
 #' @export
 rodps.table.summary <- function(tbl) {
     stblname <- paste("rodps_", paste(sample(c(letters[1:6], 0:9), 30, replace = TRUE),

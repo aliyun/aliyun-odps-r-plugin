@@ -2,16 +2,22 @@
 % Please edit documentation in R/rodps_table.R
 \name{rodps.table.sample.strat}
 \alias{rodps.table.sample.strat}
-\title{分层抽样 select abc from ( *, row_number() over( partition by g order by
-rand()) r_rn, rand() as r_select ) sub
-1. by percent sub where r_select < rate
-2. by_number sub where rn <= rate}
+\alias{rodps.sample.strat}
+\title{Sample Table}
 \usage{
 rodps.table.sample.strat(srctable, tgttable, samplerate, strat, select = NULL)
+
+rodps.sample.strat(srctable, tgttable, samplerate, strat, select = NULL)
 }
 \description{
-分层抽样 select abc from ( *, row_number() over( partition by g order by
+The sample strategy is as similar as:
+}
+\details{
+select abc from ( *, row_number() over( partition by g order by
 rand()) r_rn, rand() as r_select ) sub
 1. by percent sub where r_select < rate
-2. by_number sub where rn <= rate
+2. by number sub where rn <= rate
+}
+\seealso{
+\code{\link{rodps.table.sample.srs}}
 }
