@@ -1,10 +1,11 @@
 # extend predict function
 
-# generic rodps.predict
+#' @export
 rodps.predict <- function(x, ...) {
     UseMethod("rodps.predict", x)
 }
 
+#' @export
 rodps.predict.rpart <- function(object, srctbl, tgttbl, inc.col = NULL, run = TRUE) {
     if (!require("rpart")) {
         stop("rpart package required in rodps.predict.rpart")
@@ -78,7 +79,9 @@ rodps.predict.rpart <- function(object, srctbl, tgttbl, inc.col = NULL, run = TR
     }
 }
 
-# predict fda model
+#' Predict fda model
+#'
+#' @export
 rodps.predict.fda <- function(object, srctbl, tgttbl, type = "class", prior, dimension = 2) {
     if (!require(mda)) {
         stop("mda library not available")

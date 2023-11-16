@@ -1,8 +1,13 @@
-#' store unique result in a temp table
+#' Store unique result in a temp table
+#' 
+#' @export
 summary.rodps.data <- function(rd) {
     rodps.table.summary(rd@tbl)
 }
 
+#' Export table summary
+#' 
+#' @export
 rodps.table.summary <- function(tbl) {
     stblname <- paste("rodps_", paste(sample(c(letters[1:6], 0:9), 30, replace = TRUE),
         collapse = "", sep = ""), sep = "")

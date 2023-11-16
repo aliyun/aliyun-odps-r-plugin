@@ -10,6 +10,14 @@ init.odps.ext <- function() {
         load.time = "POSIXct", data = "data.frame"))
 }
 
+#' Create odps.data and odps.vector in S4
+#' store head result in a temp table
+#'
+#' @export
+head.rodps.data <- function(rd, n = 6L) {
+    rodps.table.head(rd@tbl)
+}
+
 # set up the odps.data class
 rodps.data <- function(tblname) {
     rt <- new("rodps.data", tbl = tblname, load.time = Sys.time())
@@ -25,7 +33,6 @@ rodps.vector <- function(tblname, colname) {
 # extend hist hist returns a list of breaks,counts, density, mids, xname,
 # equidist, class attr generator a sql select count( case when ... end) b1,
 # count(case when ...) ... from tbl; then plot with the list
-
 hist.rodps.vector <- function(ov) {
     h <- list()
     # nbins = 10 get the min/max

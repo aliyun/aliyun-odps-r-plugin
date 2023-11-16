@@ -2,12 +2,12 @@
 % Please edit documentation in R/odps_advanced_function_head.R
 \name{head.rodps.data}
 \alias{head.rodps.data}
-\title{create odps.data and odps.vector in S4
+\title{Create odps.data and odps.vector in S4
 store head result in a temp table}
 \usage{
 head.rodps.data(rd, n = 6L)
 }
 \description{
-create odps.data and odps.vector in S4
+Create odps.data and odps.vector in S4
 store head result in a temp table
 }

@@ -1,3 +1,4 @@
+#' @export
 str.rodps.data <- function(rd) {
     rodps.str(rd@tbl)
 }

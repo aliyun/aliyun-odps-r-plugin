@@ -9,6 +9,13 @@
         .init_odps_operator(conf)
     }
 }
+
+#' Init ODPS with configs
+#' 
+#' @param path File path string indicating odps_config
+#' @param access.id Access ID string
+#' @param access.key Access Key string
+#' @export
 rodps.init <- function(path = NULL, access.id = NULL, access.key = NULL) {
     # in case of isolating global variable by using rm(list=ls(all=TRUE)) +
     # rodps.init
@@ -28,10 +35,15 @@ rodps.init <- function(path = NULL, access.id = NULL, access.key = NULL) {
     }
 }
 
+#' Change RODPS TempDir
+#'
+#' @param path Target path string
+#' @export
 rodps.tmpdir <- function(path) {
     rodpsTmpdir <<- path
 }
 
+#' @noRd
 .init_odps_operator <- function(conf) {
     # tunnel endpoint should be explicitly specified
     if (!is.na(conf["tunnel_endpoint"])) {
@@ -53,6 +65,7 @@ rodps.tmpdir <- function(path) {
     rodps.init.type()
 }
 
+#' @noRd
 init.java.env <- function(libname, pkgname) {
     library(rJava)
     if ("windows" == .Platform$OS.type) {
@@ -71,6 +84,7 @@ init.java.env <- function(libname, pkgname) {
     init.dtsdk.env(libname, pkgname)
 }
 
+#' @noRd
 init.dtsdk.env <- function(libname, pkgname) {
     jarPath <- paste(libname, pkgname, "java", "DT", sep = .Platform$file.sep)
     jarFiles <- list.files(jarPath)
@@ -80,6 +94,7 @@ init.dtsdk.env <- function(libname, pkgname) {
     }
 }
 
+#' @noRd
 rodps.loadconf <- function(path = NULL) {
     if (is.null(path) || path == "" || !file.exists(path)) {
         path <- Sys.getenv("RODPS_CONFIG")
@@ -133,6 +148,7 @@ rodps.loadconf <- function(path = NULL) {
     return(values)
 }
 
+#' @noRd
 rodps.init.type <- function() {
     type.map <- c("integer=int,tinyint,smallint", "numeric=double,float,long,bigint",
         "POSIXct=datetime", "Date=date", "character=string", "logical=boolean", "factor=string")
@@ -160,6 +176,7 @@ rodps.init.type <- function() {
     rodps.type.java2r <<- values2
 }
 
+#' @export
 rodps.change.types <- function(types) {
     newtypes <- c()
     i <- 1
@@ -170,6 +187,7 @@ rodps.change.types <- function(types) {
     return(newtypes)
 }
 
+#' @noRd
 load.errormsg <- function() {
     keys <- c()
     values <- c()
@@ -184,6 +202,8 @@ load.errormsg <- function() {
     values <- add.errormsg(values, "invalid_project_name", "The project name can not be empty ")
     return(values)
 }
+
+#' @noRd
 add.errormsg <- function(errormap, newkey, newvalue) {
     idx <- length(errormap) + 1
     errormap[idx] <- newvalue

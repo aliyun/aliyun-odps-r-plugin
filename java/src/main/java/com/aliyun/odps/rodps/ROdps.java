@@ -589,7 +589,6 @@ public class ROdps {
       }
       String logViewUrl = logView.generateLogView(inst, 7 * 24);
       System.err.println(logViewUrl);
-      LOG.info(logViewUrl);
 
       inst.waitForSuccess();
       Map<String, String> results = inst.getTaskResults();

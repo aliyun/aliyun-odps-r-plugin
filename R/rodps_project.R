@@ -23,7 +23,7 @@ rodps.project.use <- function(projectname) {
     odpsOperator$useProject(projectname)
 }
 
-#' Get current project name.
+#' Show current project name.
 #'
 #' @author \email{yunyuan.zhangyy@alibaba-inc.com}
 #' @seealso \code{\link{rodps.project.use}}
@@ -36,8 +36,5 @@ rodps.project.current <- function() {
     return(odpsOperator$getProjectName(""))
 }
 
-#' Get current project name.
-#' 
-#' @seealso \code{\link{rodps.project.current}}
-#' @export
+#' @rdname rodps.project.current
 rodps.current.project <- rodps.project.current

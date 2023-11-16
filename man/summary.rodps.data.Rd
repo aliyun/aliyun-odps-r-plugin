@@ -2,10 +2,10 @@
 % Please edit documentation in R/odps_advanced_function_summary.R
 \name{summary.rodps.data}
 \alias{summary.rodps.data}
-\title{store unique result in a temp table}
+\title{Store unique result in a temp table}
 \usage{
 \method{summary}{rodps.data}(rd)
 }
 \description{
-store unique result in a temp table
+Store unique result in a temp table
 }

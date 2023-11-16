@@ -1,13 +1,16 @@
-#' create odps.data and odps.vector in S4
+#' Create odps.data and odps.vector in S4
+NULL
 
-# extend hist hist returns a list of breaks,counts, density, mids, xname,
-# equidist, class attr generator a sql select count( case when ... end) b1,
-# count(case when ...) ... from tbl; then plot with the list
-
+#' @rdname rodps.table.hist
 hist.rodps.vector <- function(ov) {
     rodps.table.hist(ov@tbl, ov@col)
 }
 
+#' Extend hist hist returns a list of breaks, counts, density, mids, xname,
+#' equidist, class attr generator a sql select count( case when ... end) b1,
+#' count(case when ...) ... from tbl; then plot with the list
+#'
+#' @export
 rodps.table.hist <- function(tablename, colname, breaks = NULL, freq = TRUE, include.lowest = TRUE,
     right = TRUE, main = paste("Histogram of ", colname), xlab = colname, ...) {
 
@@ -74,4 +77,6 @@ rodps.table.hist <- function(tablename, colname, breaks = NULL, freq = TRUE, inc
     plot(h, freq = freq, main = main, xlab = xlab, ...)
     invisible(h)
 }
+
+#' @rdname rodps.table.hist
 rodps.hist <- rodps.table.hist

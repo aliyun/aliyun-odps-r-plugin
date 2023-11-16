@@ -84,7 +84,7 @@ rodps.unset <- function(key) {
     }
 }
 
-#' Sql Command
+#' SQL Command
 #'
 #' Run SQL command and return result(in data.frame type).
 #'
@@ -132,7 +132,7 @@ rodps.sql <- function(query, interactive = FALSE) {
         return(.rodps.bigSql(query, interactive))
     }
     ret <- odpsOperator$runSqlTask(query, interactive)
-    if (ret == NULL || ret$size() == 0) {
+    if (is.null(ret) || ret$size() == 0) {
         return(NULL)
     }
     if (ret$size() == 1) {

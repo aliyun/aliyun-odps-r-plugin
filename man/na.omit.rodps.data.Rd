@@ -2,10 +2,10 @@
 % Please edit documentation in R/odps_advanced_function__naomit.R
 \name{na.omit.rodps.data}
 \alias{na.omit.rodps.data}
-\title{remove NULL values from a table}
+\title{Remove NULL values from a table}
 \usage{
 \method{na.omit}{rodps.data}(rd)
 }
 \description{
-remove NULL values from a table
+Remove NULL values from a table
 }

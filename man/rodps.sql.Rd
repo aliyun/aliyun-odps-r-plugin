@@ -5,9 +5,9 @@
 \alias{rodps.query}
 \title{Sql Command}
 \usage{
-rodps.sql(query)
+rodps.sql(query, interactive = FALSE)
 
-rodps.query(query)
+rodps.query(query, interactive = FALSE)
 }
 \arguments{
 \item{query}{sql command,ex. select/insert/etc.}
