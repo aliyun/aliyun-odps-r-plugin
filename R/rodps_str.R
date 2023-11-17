@@ -28,8 +28,8 @@ rodps.str <- function(tbl) {
             rows <- min(obs, 10)
         }
         cat(sprintf(" $ %s: %s  %s", format(names(d)[i], width = max(nchar(names(d)))),
-            format(class(d[, i]), width = max(nchar(sapply(df, "class")))),
-            paste(d[,i][1:rows], collapse = " ")))
+            format(class(d[, i]), width = max(nchar(sapply(df, "class")))), paste(d[,
+                i][1:rows], collapse = " ")))
         if (obs > 10) {
             cat(" ... \n")
         } else {

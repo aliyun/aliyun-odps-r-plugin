@@ -6,12 +6,12 @@ rodps.init("~/.config/odps_config.ini")
 
 # Reset test data
 if (rodps.table.exist("iris")) {
-  rodps.table.drop("iris")
+    rodps.table.drop("iris")
 }
 
 # Upload iris dataset
-names(iris) <- gsub("\\.","_",names(iris))
-rodps.table.write(iris, 'iris')
+names(iris) <- gsub("\\.", "_", names(iris))
+rodps.table.write(iris, "iris")
 
 # Show current project
 rodps.project.current()
