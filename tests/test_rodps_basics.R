@@ -22,7 +22,7 @@ result
 # Run plain SQL and return remote table
 result <- rodps.sql(sql_str, result.table.limit = 0L)
 assert_that(is.character(result))
-result_table <- result[1] # Char vector whose first element is the resulted table name
+result_table <- result[1]  # Char vector whose first element is the resulted table name
 assert_that(rodps.table.rows(result_table) == 3)
 rodps.table.read(result_table)
 rodps.table.drop(result_table)
