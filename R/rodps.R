@@ -21,4 +21,5 @@
 #' @importFrom stats df
 #' @importFrom stats runif
 #' @importFrom utils read.table
+#' @importFrom stats na.omit
 NULL

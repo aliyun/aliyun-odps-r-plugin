@@ -53,7 +53,7 @@ public class DownloadWorker implements Runnable {
     this.savePath = savePath;
     this.context = context;
     this.midStorage = new SqliteMiddleStorage<DownloadSession>(this.savePath, context);
-    LOG.info(threadId + ":" + String.valueOf(startRecordNumber) + " "
+    LOG.debug(threadId + ":" + String.valueOf(startRecordNumber) + " "
         + String.valueOf(downloadRecordNumber));
     t = new Thread(this, String.valueOf(threadId));
     t.start();

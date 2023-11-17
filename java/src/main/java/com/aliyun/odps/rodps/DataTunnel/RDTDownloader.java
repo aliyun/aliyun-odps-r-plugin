@@ -54,10 +54,10 @@ public class RDTDownloader extends DTProcess<DownloadWorker, DownloadSession> {
         downloadSession = tunnel.createDownloadSession(context.getProject(), context.getTable());
       }
       context.setAction(downloadSession);
-      LOG.info("start to create download");
+      LOG.debug("start to create download");
       context.setRecordCount(downloadSession.getRecordCount());
       context.setSchema(downloadSession.getSchema());
-      LOG.info("end to init RDTDownloader");
+      LOG.debug("end to init RDTDownloader");
     } catch (TunnelException e) {
       LOG.error(e.getMessage(), e);
       throw new ROdpsException(e.getErrorCode() + e.getErrorMsg());

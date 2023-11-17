@@ -39,10 +39,10 @@ public abstract class DTProcess<T, C> {
   public List<T> createWorkerList(String fileName) throws ROdpsException {
     int threadNum = context.getActualThreads();
 
-    LOG.info(String.format("start to create %d processing workers", threadNum));
+    LOG.debug(String.format("start to create %d processing workers", threadNum));
 
     long recordNumPerThread = this.context.getDownloadRecords() / threadNum;
-    LOG.info("record number per thread:" + String.valueOf(recordNumPerThread));
+    LOG.debug("record number per thread:" + String.valueOf(recordNumPerThread));
     List<T> workers = new ArrayList<T>();
     for (int i = 0; i < threadNum; ++i) {
       T worker;
