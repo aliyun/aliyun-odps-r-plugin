@@ -32,26 +32,25 @@ install.packages('DBI')
 install.packages('rJava')
 install.packages('RSQLite')
 ```
-Or you can use `devtools` to help you resolve dependencies:
-
-```R
-install.packages('devtools')
-```
-
 2. Install RODPS
 
     2.1. Install from release package
-   
+
+    Check out the latest version on [release page](https://github.com/aliyun/aliyun-odps-r-plugin/releases). As for version 2.1.3, for example: 
+
     ```R
     install.packages('https://github.com/aliyun/aliyun-odps-r-plugin/releases/download/v2.1.3/RODPS_2.1.3.tar.gz', type="source", repos=NULL)
     ```
 
-    2.2. Install from source
+    2.2. Install with `devtools` packages
 
-    * Clone the source repo and build with `sh tools/build.sh`
-    * Install built package: `R CMD INSTALL target/RODPS_2.1.3.tar.gz`
+    This method requires JDK and Maven executables to build java module.
 
+    ```R
+    install_github("aliyun/aliyun-odps-r-plugin")
+    ```
 
+    2.3 Install from CRAN (**Under development**)
 
 ## Getting Started
 
@@ -63,27 +62,10 @@ export RODPS_CONFIG=/path/to/odps_config.ini
 
 See the configuration template: [odps_config.ini.template](examples/odps_config.ini.template)
 
-2. Basic RODPS functions:
+2. Basic Usage
 
-```R
-> library("RODPS")  # Load RODPS
->
-> tbl1 <- rodps.table.read("tbl1")  # read dataframe from ODPS
-> d <- head(tbl1)
->
-> rodps.sql('create table test_table(id bigint);')   # execute sql
->
-> names(iris) <- gsub("\\.","_",names(iris))                                   # rename columns
-> rodps.table.write(iris, 'iris')                                              # write dataframe to ODPS
->
-> rodps.table.sample.srs('tbl1','small_tbl1', 100 )                            # sampling by raw
->
-> rodps.table.hist(tblname='iris', colname='species', col=rainbow(10), freq=F) # create a histogram
->
-> library(rpart)
-> fit <- rpart(Species~., data=iris)
-> rodps.predict.rpart(fit, srctbl='iris',tgttbl='iris_p')                      # modeling
-```
+* [Basic project and SQL functions](https://github.com/aliyun/aliyun-odps-r-plugin/blob/master/tests/test_rodps_basics.R)
+* [Basic table functions](https://github.com/aliyun/aliyun-odps-r-plugin/blob/master/tests/test_rodps_table.R)
 
 ## Under the Hood
 
