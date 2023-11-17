@@ -1,7 +1,10 @@
 #!/bin/bash
 basepath=$(cd "$(dirname "$0")";pwd)/..
-sh $basepath/configure
 
+# fresh building java lib
+rm -rf $basepath/inst/java/rodps-*.jar >> /dev/null 2>&1
+
+sh $basepath/configure
 sh $basepath/tools/format_code.sh
 sh $basepath/tools/gendoc.sh
 

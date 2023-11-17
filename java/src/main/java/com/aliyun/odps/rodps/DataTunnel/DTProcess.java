@@ -53,7 +53,7 @@ public abstract class DTProcess<T, C> {
           createWorker(i, context, i * recordNumPerThread, records, createTempFileName(fileName, i));
       workers.add(worker);
     }
-    LOG.info("finish creating processing workers");
+    LOG.debug("finish creating processing workers");
     return workers;
   }
 

@@ -60,7 +60,7 @@ public class RDTUploader extends DTProcess<UploadWorker, UploadSession> {
     List<UploadWorker> workers = this.createWorkerList(dataFilePath);
     try {
       String errorMessage = "";
-      LOG.info("wait for upload end");
+      LOG.debug("wait for upload end");
       for (UploadWorker worker : workers) {
         worker.t.join();
         if (!worker.isSuccessful()) {

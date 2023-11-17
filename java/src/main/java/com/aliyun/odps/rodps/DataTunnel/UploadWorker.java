@@ -57,7 +57,7 @@ public class UploadWorker implements Runnable {
   }
 
   public void run() {
-    LOG.info("Start to upload threadId=" + this.threadId);
+    LOG.info("start to upload threadId=" + this.threadId);
     long blockID = (long) threadId;
     int retries = 1;
     while (retries <= maxRetries && !isSuccessful) {
