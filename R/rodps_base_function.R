@@ -55,12 +55,6 @@ rodps.unset <- function(key) {
     odpsOperator$unset(key)
 }
 
-.check.init <- function() {
-    if (length(ls(envir = .GlobalEnv, pattern = "odpsOperator")) == 0 || is.null(odpsOperator)) {
-        stop(print("RODPS uninitialized or session timeout, please exectue rodps.init(path), path for the path of odps_config.ini"))
-    }
-}
-
 .dataframe.to.sqlite <- function(dataframe, thread, filename, tablename, isdebug) {
     if (!require(DBI, quietly = TRUE)) {
         stop("DBI library not available")

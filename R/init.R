@@ -10,6 +10,12 @@
     }
 }
 
+.check.init <- function() {
+  if (length(ls(envir = .GlobalEnv, pattern = "odpsOperator")) == 0 || is.null(odpsOperator)) {
+    stop(print("RODPS uninitialized or session timeout, please exectue rodps.init(path), path for the path of odps_config.ini"))
+  }
+}
+
 #' Init ODPS with configs
 #' 
 #' @param path File path string indicating odps_config
