@@ -24,9 +24,6 @@ assert_that(rodps.table.exist("iris"))
 assert_that(!rodps.table.exist("iris-non-existed"))
 
 rodps.table.list()
-
-# iris not partition table tryCatch(rodps.table.partitions('iris'))
-
 rodps.table.desc("iris")
 
 assert_that(rodps.table.rows("iris") == 150)

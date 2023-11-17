@@ -1,4 +1,4 @@
-.rodps.bigSql <- function(query, memsize = 10737518240, mcqa = FALSE) {
+.rodps.bigSql <- function(query, mcqa = FALSE, memsize = 10737518240) {
     .check.init()
     if (is.null(query) || query == "") {
         stop(error("input_query_error", "query is null"))
@@ -31,6 +31,7 @@
 #'
 #' @param query SQL string
 #' @param mcqa Whether enable MCQA or not
+#' @param result.table.limit The size limit of resulted table as engine side table or fetched data frame.
 #' @author \email{yunyuan.zhangyy@alibaba-inc.com}
 #' @seealso   \code{\link{RODPS}}, \code{\link{rodps.table}},
 #'   \code{\link{rodps.project}}
@@ -38,7 +39,7 @@
 #' ## select the data of 'sales' in January ,and store the result in data.frame
 #' \dontrun{ data <- rodps.sql('select * from sales where month=1')}
 #' @export
-rodps.sql <- function(query, mcqa = FALSE) {
+rodps.sql <- function(query, mcqa = FALSE, result.table.limit = 10737518240) {
     .check.init()
     if (is.null(query) || query == "") {
         stop(error("input_query_error", "query is null"))
@@ -69,9 +70,8 @@ rodps.sql <- function(query, mcqa = FALSE) {
         }
     }
 
-
     if (type == "select") {
-        return(.rodps.bigSql(query, mcqa))
+        return(.rodps.bigSql(query, mcqa=mcqa, memsize=result.table.limit))
     }
     ret <- odpsOperator$runSqlTask(query, mcqa)
     if (is.null(ret) || ret$size() == 0) {

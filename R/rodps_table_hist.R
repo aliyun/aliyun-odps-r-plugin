@@ -20,6 +20,7 @@ rodps.table.hist <- function(tblname, colname, breaks = NULL, freq = TRUE, inclu
         tblname, ";", sep = " ")
     cat("\n")
     mm <- rodps.sql(sql)
+
     # nclass.Sturges
     nbin <- ceiling(log2(mm[1, 1]) + 1)
     if (is.null(breaks)) {

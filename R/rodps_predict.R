@@ -1,12 +1,17 @@
-# extend predict function
-
+#' Extend predict function
 #' @export
 rodps.predict <- function(x, ...) {
     UseMethod("rodps.predict", x)
 }
 
+#' Extend Recursive Partitioning
+#' 
+#' @param object Rpart model
+#' @param srctbl Data source table
+#' @param tgttbl Target table of prediction results
+#' @param dryrun Return the prediction SQL string instead of running the query
 #' @export
-rodps.predict.rpart <- function(object, srctbl, tgttbl, inc.col = NULL, run = TRUE) {
+rodps.predict.rpart <- function(object, srctbl, tgttbl, inc.col = NULL, dryrun = FALSE) {
     if (!require("rpart")) {
         stop("rpart package required in rodps.predict.rpart")
     }
@@ -63,7 +68,7 @@ rodps.predict.rpart <- function(object, srctbl, tgttbl, inc.col = NULL, run = TR
     sel = sprintf("%s \n  %s,", sel, yvar)
     sql = sprintf("%s %s \n%s FROM %s;\n", sql, sel, cw, srctbl)
 
-    if (!run) {
+    if (dryrun) {
         return(sql)
     } else {
         cat(sql)
@@ -72,17 +77,20 @@ rodps.predict.rpart <- function(object, srctbl, tgttbl, inc.col = NULL, run = TR
         }
 
         if (rodps.table.exist(tgttbl)) {
-            stop(sprintf("target table %s already exists", srctbl))
+            stop(sprintf("target table %s already exists", tgttbl))
         }
-
         rodps.sql(sql)
     }
 }
 
-#' Predict fda model
-#'
+#' Extend FDA
+
+#' @param object FDA model
+#' @param srctbl Data source table
+#' @param tgttbl Target table of prediction results
+#' @param dryrun Return the prediction SQL string instead of running the query
 #' @export
-rodps.predict.fda <- function(object, srctbl, tgttbl, type = "class", prior, dimension = 2) {
+rodps.predict.fda <- function(object, srctbl, tgttbl, prior, type = "class", dimension = 2) {
     if (!require(mda)) {
         stop("mda library not available")
     }

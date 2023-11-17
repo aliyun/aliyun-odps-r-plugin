@@ -60,7 +60,6 @@ $SED_CMD -E "s|Version: .*|Version: ${RVERSION}|g" "$basepath/DESCRIPTION"
 cat >$basepath/R/odps_version.R <<__EOF__
 rodps.version <- function() {
     print("RODPS ${RVERSION}")
-    print("BUILDDATE ${VERSIONDATE}")
 }
 __EOF__
 

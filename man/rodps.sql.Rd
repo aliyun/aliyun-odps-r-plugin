@@ -5,14 +5,16 @@
 \alias{rodps.query}
 \title{SQL Command}
 \usage{
-rodps.sql(query, mcqa = FALSE)
+rodps.sql(query, mcqa = FALSE, result.table.limit = 10737518240)
 
-rodps.query(query, mcqa = FALSE)
+rodps.query(query, mcqa = FALSE, result.table.limit = 10737518240)
 }
 \arguments{
 \item{query}{SQL string}
 
 \item{mcqa}{Whether enable MCQA or not}
+
+\item{result.table.limit}{The size limit of resulted table as engine side table or fetched data frame.}
 }
 \description{
 Run SQL command and return result(in data.frame type).
