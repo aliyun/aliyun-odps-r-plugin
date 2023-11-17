@@ -16,16 +16,21 @@ rodps.project.current()
 sql_str <- "select species, count(1) from iris group by species"
 result <- rodps.sql(sql_str)
 assert_that(is.data.frame(result))  # Resulted data frame fetched locally
+assert_that(nrow(result) == 3)
+result
 
+# Run plain SQL and return remote table
 result <- rodps.sql(sql_str, result.table.limit = 0L)
-assert_that(is.character(result))  # Char vector whose first element is the resulted table name
-rodps.table.read(result[1])
-
-# Run plain SQL with MCQA
-rodps.sql(sql_str, mcqa = TRUE, result.table.limit = 0L)
-result_table <- result[1]
+assert_that(is.character(result))
+result_table <- result[1] # Char vector whose first element is the resulted table name
 assert_that(rodps.table.rows(result_table) == 3)
 rodps.table.read(result_table)
+rodps.table.drop(result_table)
+
+# Run plain SQL with MCQA
+result <- rodps.sql(sql_str, mcqa = TRUE)
+assert_that(nrow(result) == 3)
+result
 
 # Drop test table
 rodps.table.drop("iris")
