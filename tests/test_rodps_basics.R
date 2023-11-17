@@ -15,7 +15,7 @@ rodps.project.current()
 # Run plain SQL
 sql_str <- "select species, count(1) from iris group by species"
 result <- rodps.sql(sql_str)
-assert_that(is.data.frame(result)) # Resulted data frame fetched locally
+assert_that(is.data.frame(result))  # Resulted data frame fetched locally
 
 result <- rodps.sql(sql_str, result.table.limit = 0L)
 assert_that(is.character(result))  # Char vector whose first element is the resulted table name

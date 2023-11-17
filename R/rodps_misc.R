@@ -1,8 +1,8 @@
 #' @export
 init.odps.ext <- function() {
-    #' tbl: table name, does not accept partition
-    #' load.time: when object is created, to determine if the buffer data is outdated
-    #' data: local buffer, if data is small enough, load it into buffer
+    # tbl: table name, does not accept partition load.time: when object is
+    # created, to determine if the buffer data is outdated data: local buffer,
+    # if data is small enough, load it into buffer
     setClass("rodps.data", representation(tbl = "character", load.time = "POSIXct",
         data = "data.frame"))
     setClass("rodps.vector", representation(tbl = "character", col = "character",

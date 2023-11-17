@@ -71,7 +71,7 @@ rodps.sql <- function(query, mcqa = FALSE, result.table.limit = 10737518240) {
     }
 
     if (type == "select") {
-        return(.rodps.bigSql(query, mcqa=mcqa, memsize=result.table.limit))
+        return(.rodps.bigSql(query, mcqa = mcqa, memsize = result.table.limit))
     }
     ret <- odpsOperator$runSqlTask(query, mcqa)
     if (is.null(ret) || ret$size() == 0) {

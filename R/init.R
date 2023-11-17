@@ -11,9 +11,9 @@
 }
 
 .check.init <- function() {
-  if (length(ls(envir = .GlobalEnv, pattern = "odpsOperator")) == 0 || is.null(odpsOperator)) {
-    stop(print("RODPS uninitialized or session timeout, please exectue rodps.init(path), path for the path of odps_config.ini"))
-  }
+    if (length(ls(envir = .GlobalEnv, pattern = "odpsOperator")) == 0 || is.null(odpsOperator)) {
+        stop(print("RODPS uninitialized or session timeout, please exectue rodps.init(path), path for the path of odps_config.ini"))
+    }
 }
 
 #' Init ODPS with configs
@@ -182,6 +182,7 @@ rodps.init.type <- function() {
     rodps.type.java2r <<- values2
 }
 
+#' Change RODPS Java types into R
 #' @export
 rodps.change.types <- function(types) {
     newtypes <- c()
