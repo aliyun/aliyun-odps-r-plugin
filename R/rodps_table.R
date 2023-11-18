@@ -372,7 +372,7 @@ rodps.table.write <- function(dataframe, full.tablename, partition = NULL, table
     }
 
     if (length(colnames(dataframe)) == 0) {
-        stop("dataframe should have as least one column")
+        stop("dataframe should have at least one column")
     }
 
     if (!is.null(partition) && !rodps.table.exist(full.tablename)) {
