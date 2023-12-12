@@ -1,3 +1,3 @@
 rodps.version <- function() {
-    print("RODPS 2.1.5")
+    print("RODPS 2.1.6")
 }

@@ -42,6 +42,7 @@ public class DownloadWorker implements Runnable {
   public Thread t;
   private int threadId;
   private MiddleStorage midStorage;
+  private int maxRetries = 5;
 
   DownloadWorker(int threadId, Context<DownloadSession> context, long startRecordNumber,
       long downloadRecordNumber, String savePath) throws ROdpsException {
@@ -60,23 +61,37 @@ public class DownloadWorker implements Runnable {
   }
 
   public void run() {
-    try {
-      RecordReader reader = null;
-      if (downloadRecordNumber > 0) {
-        reader = context.getAction().openRecordReader(startRecordNumber, downloadRecordNumber);
+    LOG.info("start to download threadId=" + this.threadId);
+    int retries = 1;
+    while (retries <= maxRetries && !isSuccessful) {
+      try {
+        RecordReader reader = null;
+        if (downloadRecordNumber > 0) {
+          reader = context.getAction().openRecordReader(startRecordNumber, downloadRecordNumber);
+        }
+        loadedRecordNum = midStorage.readDataTunnel(reader, downloadRecordNumber);
+        LOG.info("threadId=" + this.threadId + " download finished, record="
+            + this.loadedRecordNum);
+        isSuccessful = true;
+      } catch (Exception e) {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        this.errorMessage = sw.toString();
+        if (retries <= maxRetries) {
+          LOG.warn("download failed in attempt " + retries + ", threadId=" + threadId + ", stack=" + sw.toString());
+          try {
+            Thread.sleep(1000);
+          } catch (InterruptedException e1) {
+            LOG.error("Sleep interrupted!", e1);
+          }
+        } else {
+          LOG.error("download failed, threadId=" + threadId + ", stack=" + sw.toString());
+        }
       }
-      loadedRecordNum = midStorage.readDataTunnel(reader, downloadRecordNumber);
-
-      LOG.info("threadId=" + this.threadId + " download finished, record="
-          + this.loadedRecordNum);
-      isSuccessful = true;
-    } catch (Exception e) {
-      StringWriter sw = new StringWriter();
-      e.printStackTrace(new PrintWriter(sw));
-      this.errorMessage = sw.toString();
-      LOG.error("download failed, threadId=" + threadId + ", stack=" + sw.toString());
-    } finally {
-      midStorage.close();
+      retries++;
+    }
+    if (this.midStorage != null) {
+      this.midStorage.close();
     }
   }
 
