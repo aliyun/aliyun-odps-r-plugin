@@ -44,7 +44,7 @@ public class UploadWorker implements Runnable {
   private RecordWriter writer;
   private long uploaded;
   private MiddleStorage midStorage;
-  private int maxRetries = 3;
+  private int maxRetries = 5;
 
   public UploadWorker(int threadId, Context<UploadSession> context, String fileName)
       throws ROdpsException {
@@ -57,7 +57,7 @@ public class UploadWorker implements Runnable {
   }
 
   public void run() {
-    LOG.info("Start to upload threadId=" + this.threadId);
+    LOG.info("start to upload threadId=" + this.threadId);
     long blockID = (long) threadId;
     int retries = 1;
     while (retries <= maxRetries && !isSuccessful) {
@@ -76,6 +76,11 @@ public class UploadWorker implements Runnable {
         this.errorMessage = sw.toString();
         if (retries <= maxRetries) {
           LOG.warn("upload failed in attempt " + retries + ", threadId=" + threadId + ", stack=" + sw.toString());
+          try {
+            Thread.sleep(1000);
+          } catch (InterruptedException e1) {
+            LOG.error("Sleep interrupted!", e1);
+          }
         } else {
           LOG.error("upload failed finally, threadId=" + threadId + ", stack=" + sw.toString());
         }
