@@ -1,4 +1,4 @@
-.rodps.bigSql <- function(query, mcqa = FALSE, memsize = 10737518240) {
+.rodps.bigSql <- function(query, mcqa = FALSE, memsize = 10737518240, thread = 8) {
     .check.init()
     if (is.null(query) || query == "") {
         stop(error("input_query_error", "query is null"))
@@ -15,7 +15,7 @@
         attr(x, "result:size") <- length
         return(x)
     } else {
-        result <- try(rodps.table.read(tmptable, memsize = memsize))
+        result <- try(rodps.table.read(tmptable, memsize = memsize, thread = thread))
         odpsOperator$runSqlTask(paste("DROP TABLE ", tmptable, sep = ""), mcqa)
         if ("try-error" == class(result)) {
             stop(paste("Exception ocurred when loading table:", tmptable, sep = ""))
@@ -32,6 +32,7 @@
 #' @param query SQL string
 #' @param mcqa Whether enable MCQA or not
 #' @param result.table.limit The size limit of resulted table as engine side table or fetched data frame.
+#' @param thread The threading number to read table data when the table size is larger than `result.table.limit`.
 #' @author \email{yunyuan.zhangyy@alibaba-inc.com}
 #' @seealso   \code{\link{RODPS}}, \code{\link{rodps.table}},
 #'   \code{\link{rodps.project}}
@@ -39,7 +40,7 @@
 #' ## select the data of 'sales' in January ,and store the result in data.frame
 #' \dontrun{ data <- rodps.sql('select * from sales where month=1')}
 #' @export
-rodps.sql <- function(query, mcqa = FALSE, result.table.limit = 10737518240) {
+rodps.sql <- function(query, mcqa = FALSE, result.table.limit = 10737518240, thread = 8) {
     .check.init()
     if (is.null(query) || query == "") {
         stop(error("input_query_error", "query is null"))
@@ -71,7 +72,7 @@ rodps.sql <- function(query, mcqa = FALSE, result.table.limit = 10737518240) {
     }
 
     if (type == "select") {
-        return(.rodps.bigSql(query, mcqa = mcqa, memsize = result.table.limit))
+        return(.rodps.bigSql(query, mcqa = mcqa, memsize = result.table.limit, thread = thread))
     }
     ret <- odpsOperator$runSqlTask(query, mcqa)
     if (is.null(ret) || ret$size() == 0) {

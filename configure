@@ -6,7 +6,7 @@ basepath=$(
     pwd
 )
 
-RVERSION=2.1.6
+RVERSION=2.1.6.1
 VERSIONDATE=$(date +"%Y-%m-%d %H:%M:%S")
 
 # Constants for colors

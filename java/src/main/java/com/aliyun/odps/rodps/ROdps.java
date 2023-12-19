@@ -563,43 +563,60 @@ public class ROdps {
     // Create instance
     Instance inst;
     String TASK_NAME = "rodps_sql_task";
-    try {
-      if (interactive) {
-        TASK_NAME = "rodps_mcqa_task";
-        SQLExecutorBuilder builder = SQLExecutorBuilder.builder();
-        SQLExecutor sqlExecutor = null;
-        sqlExecutor =
-            builder
-                .odps(odps)
-                .executeMode(ExecuteMode.INTERACTIVE)
-                .fallbackPolicy(FallbackPolicy.alwaysFallbackPolicy())
-                .build();
-        if (settings.containsKey("odps.sql.submit.mode")) {
-          settings.put("odps.sql.submit.mode", "script");
+    int retryTimes = 0;
+    while (true) {
+      try {
+        if (interactive) {
+          TASK_NAME = "rodps_mcqa_task";
+          SQLExecutorBuilder builder = SQLExecutorBuilder.builder();
+          SQLExecutor sqlExecutor = null;
+          sqlExecutor =
+              builder
+                  .odps(odps)
+                  .executeMode(ExecuteMode.INTERACTIVE)
+                  .fallbackPolicy(FallbackPolicy.alwaysFallbackPolicy())
+                  .build();
+          if (settings.containsKey("odps.sql.submit.mode")) {
+            settings.put("odps.sql.submit.mode", "script");
+          }
+          sqlExecutor.run(sql, settings);
+          inst = sqlExecutor.getInstance();
+        } else {
+          inst = SQLTask.run(odps, odps.getDefaultProject(), sql, TASK_NAME, settings, null);
         }
-        sqlExecutor.run(sql, settings);
-        inst = sqlExecutor.getInstance();
-      } else {
-        inst = SQLTask.run(odps, odps.getDefaultProject(), sql, TASK_NAME, settings, null);
-      }
 
-      LogView logView = new LogView(odps);
-      if (LOGVIEW_HOST != null) {
-        logView.setLogViewHost(LOGVIEW_HOST);
-      }
-      String logViewUrl = logView.generateLogView(inst, 7 * 24);
-      System.err.println(logViewUrl);
+        LogView logView = new LogView(odps);
+        if (LOGVIEW_HOST != null) {
+          logView.setLogViewHost(LOGVIEW_HOST);
+        }
+        String logViewUrl = logView.generateLogView(inst, 7 * 24);
+        System.err.println(logViewUrl);
 
-      inst.waitForSuccess();
-      Map<String, String> results = inst.getTaskResults();
-      String result = results.get(TASK_NAME);
-      if (result == null || result.isEmpty()) {
-        return new ArrayList<String>();
+        inst.waitForSuccess();
+        Map<String, String> results = inst.getTaskResults();
+        String result = results.get(TASK_NAME);
+        if (result == null || result.isEmpty()) {
+          return new ArrayList<String>();
+        }
+        return new ArrayList<String>(Arrays.asList(results.get(TASK_NAME).split("\n")));
+      } catch (OdpsException e) {
+        String errmsg = e.getMessage();
+        boolean networkJittered = errmsg.contains("please check your endpoint");
+        if (networkJittered && ++retryTimes <= RETRY_MAX) {
+          LOG.warn("connecting endpoint in attempt " + retryTimes + ", exception:" + errmsg);
+          try {
+            Thread.sleep(1000);
+          } catch (InterruptedException e1) {
+            LOG.error("Sleep interrupted!", e1);
+          }
+          continue;
+        }
+        LOG.error("runSqlTask error, sql=" + sql, e);
+        throw new ROdpsException(e);
+      } catch (Exception e) {
+        LOG.error("runSqlTask error, sql=" + sql, e);
+        throw new ROdpsException(e);
       }
-      return new ArrayList<String>(Arrays.asList(results.get(TASK_NAME).split("\n")));
-    } catch (Exception e) {
-      LOG.error("runSqlTask error, sql=" + sql, e);
-      throw new ROdpsException(e);
     }
   }
 
@@ -724,7 +741,7 @@ public class ROdps {
    * @description: TODO
    * @param spec PartitionSpec
    * @param valueDim 值的分隔符
-   * @param fieldDim　字段间的分隔符
+   * @param fieldDim 字段间的分隔符
    * @return String
    */
   private static String partitionMap2String(

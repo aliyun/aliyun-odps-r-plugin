@@ -5,9 +5,9 @@
 \alias{rodps.query}
 \title{SQL Command}
 \usage{
-rodps.sql(query, mcqa = FALSE, result.table.limit = 10737518240)
+rodps.sql(query, mcqa = FALSE, result.table.limit = 10737518240, thread = 8)
 
-rodps.query(query, mcqa = FALSE, result.table.limit = 10737518240)
+rodps.query(query, mcqa = FALSE, result.table.limit = 10737518240, thread = 8)
 }
 \arguments{
 \item{query}{SQL string}
@@ -15,6 +15,8 @@ rodps.query(query, mcqa = FALSE, result.table.limit = 10737518240)
 \item{mcqa}{Whether enable MCQA or not}
 
 \item{result.table.limit}{The size limit of resulted table as engine side table or fetched data frame.}
+
+\item{thread}{The threading number to read table data when the table size is larger than `result.table.limit`.}
 }
 \description{
 Run SQL command and return result(in data.frame type).

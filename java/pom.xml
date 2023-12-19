@@ -5,7 +5,7 @@
 
     <groupId>com.aliyun.odps</groupId>
     <artifactId>rodps</artifactId>
-    <version>2.1.6</version>
+    <version>2.1.6.1</version>
     <packaging>jar</packaging>
     <name>rodps</name>
     <url>https://github.com/aliyun/aliyun-odps-r-plugin</url>
