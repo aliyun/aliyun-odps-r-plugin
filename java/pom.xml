@@ -5,7 +5,7 @@
 
     <groupId>com.aliyun.odps</groupId>
     <artifactId>rodps</artifactId>
-    <version>2.1.6.1</version>
+    <version>2.1.6.2</version>
     <packaging>jar</packaging>
     <name>rodps</name>
     <url>https://github.com/aliyun/aliyun-odps-r-plugin</url>
@@ -21,29 +21,30 @@
             <version>0.45.5-public</version>
             <classifier>shaded</classifier>
         </dependency>
-
         <dependency>
             <groupId>org.everit.osgi.bundles</groupId>
             <artifactId>org.everit.osgi.bundles.org.json</artifactId>
             <version>1.0.0-v20140107</version>
         </dependency>
-
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.42.0.0</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
+            <version>2.20.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
             <version>2.20.0</version>
         </dependency>
     </dependencies>

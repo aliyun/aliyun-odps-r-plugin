@@ -18,8 +18,8 @@ package com.aliyun.odps.rodps.DataTunnel;
 
 import java.io.IOException;
 import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.aliyun.odps.PartitionSpec;
 import com.aliyun.odps.tunnel.TableTunnel;
@@ -28,8 +28,7 @@ import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
 
 
 public class RDTUploader extends DTProcess<UploadWorker, UploadSession> {
-  static Log LOG = LogFactory.getLog(RDTDownloader.class);
-
+  private static Logger LOG = LogManager.getLogger(RDTUploader.class);
 
   public RDTUploader(Context<UploadSession> context) throws IOException, ROdpsException {
     super(context);

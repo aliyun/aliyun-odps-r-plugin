@@ -17,8 +17,8 @@ package com.aliyun.odps.rodps.DataTunnel;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @Title: DTProcess.java
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * @version V1.0
  */
 public abstract class DTProcess<T, C> {
-  static Log LOG = LogFactory.getLog(DTProcess.class.getSuperclass());
+  private static Logger LOG = LogManager.getLogger(DTProcess.class.getSuperclass());
   protected Context<C> context;
 
   public DTProcess(Context<C> context) {

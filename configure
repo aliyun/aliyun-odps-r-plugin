@@ -6,7 +6,7 @@ basepath=$(
     pwd
 )
 
-RVERSION=2.1.6.1
+RVERSION=2.1.6.2
 VERSIONDATE=$(date +"%Y-%m-%d %H:%M:%S")
 
 # Constants for colors
@@ -41,8 +41,7 @@ function check_dependencies {
     command -v mvn >/dev/null 2>&1 || missing_deps+=("Maven")
 
     if [ ${#missing_deps[@]} -gt 0 ]; then
-        ERROR "Missing dependencies: ${missing_deps[*]}"
-        exit 1
+        ERROR "Missing dependencies: ${missing_deps[*]}" && exit 1
     fi
 }
 
@@ -80,7 +79,7 @@ function build_java_src {
     # copy jars & log4j config to libpath
     cp $basepath/java/target/lib/*.jar $libpath
     cp $basepath/java/target/lib/../*.jar $libpath
-    cp $basepath/java/src/main/resources/log4j.properties $libpath
+    cp $basepath/java/src/main/resources/log4j2.properties $libpath
     rm -rf $basepath/java/target
 
     INFO "Java building success!"
@@ -96,6 +95,10 @@ function check_java_building_env {
     maven_version=$(mvn -v | grep "Apache Maven" | awk '{print $3}')
     maven_major_version=$(echo "$maven_version" | awk -F '.' '{print $1}')
     INFO "Maven version: ${maven_version}"
+
+    if [ "x$maven_version" == "x" ]; then
+        ERROR "Unknown maven version, exit" && exit 1
+    fi
 }
 
 targetJar="rodps-${RVERSION}.jar"

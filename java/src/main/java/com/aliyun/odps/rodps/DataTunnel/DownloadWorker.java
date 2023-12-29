@@ -17,8 +17,9 @@ package com.aliyun.odps.rodps.DataTunnel;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.aliyun.odps.data.RecordReader;
 import com.aliyun.odps.tunnel.TableTunnel.DownloadSession;
 
@@ -31,7 +32,7 @@ import com.aliyun.odps.tunnel.TableTunnel.DownloadSession;
  * @version V1.0
  */
 public class DownloadWorker implements Runnable {
-  static Log LOG = LogFactory.getLog(DownloadWorker.class);
+  private static Logger LOG = LogManager.getLogger(DownloadWorker.class);
   private final long startRecordNumber;
   private final long downloadRecordNumber;
   private String errorMessage;

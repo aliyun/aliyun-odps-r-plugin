@@ -52,8 +52,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.json.JSONArray;
@@ -62,7 +63,7 @@ import org.json.JSONObject;
 
 public class ROdps {
 
-  static Log LOG = LogFactory.getLog(ROdps.class);
+  private static Logger LOG = LogManager.getLogger(ROdps.class);
   private String ODPS_PROJECT_NAME;
   private final Odps odps;
   private String DT_ENDPOINT;
@@ -94,16 +95,16 @@ public class ROdps {
       String log4j_properties)
       throws ROdpsException {
 
-    if (log4j_properties == null || log4j_properties.isEmpty())
-      LOG = LogFactory.getLog(ROdps.class);
-    else {
+    if (log4j_properties == null || log4j_properties.isEmpty()) {
+      LOG = LogManager.getLogger(ROdps.class);
+    } else {
       try {
         ConfigurationSource source = new ConfigurationSource(new FileInputStream(log4j_properties));
         Configurator.initialize(null, source);
       } catch (IOException e) {
         throw new ROdpsException("Invalid log4j property file");
       }
-      LOG = LogFactory.getLog(ROdps.class);
+      LOG = LogManager.getLogger(ROdps.class);
     }
     LOG.info("Init Odps");
     if (projectName.equals("NA")
@@ -179,17 +180,16 @@ public class ROdps {
         if (partition != null) {
           partition = formatPartition(partition, "", ",");
         }
-        Context<UploadSession> context =
-            new Context<UploadSession>(
-                odps,
-                DT_ENDPOINT,
-                projectName,
-                tableName,
-                partition,
-                -1,
-                columnDelimiter,
-                rowDelimiter,
-                threadNumber);
+        Context<UploadSession> context = new Context<UploadSession>(
+            odps,
+            DT_ENDPOINT,
+            projectName,
+            tableName,
+            partition,
+            -1,
+            columnDelimiter,
+            rowDelimiter,
+            threadNumber);
         context.setRecordCount(recordCount);
         RDTUploader uploader = new RDTUploader(context);
         uploader.upload(dataFilePathName);
@@ -239,17 +239,16 @@ public class ROdps {
         if (partition != null) {
           partition = formatPartition(partition, "", ",");
         }
-        Context<DownloadSession> context =
-            new Context<DownloadSession>(
-                odps,
-                DT_ENDPOINT,
-                projectName,
-                tableName,
-                partition,
-                limit,
-                colDelimiter,
-                rowDelimiter,
-                threadNumber);
+        Context<DownloadSession> context = new Context<DownloadSession>(
+            odps,
+            DT_ENDPOINT,
+            projectName,
+            tableName,
+            partition,
+            limit,
+            colDelimiter,
+            rowDelimiter,
+            threadNumber);
         RDTDownloader downloader = new RDTDownloader(context);
         return downloader.downloadTable(tempFile);
       } catch (IOException e) {
@@ -304,11 +303,10 @@ public class ROdps {
         JSONArray jsonArray = jsonMap.getJSONArray(type);
         for (int i = 0; i < jsonArray.length(); i++) {
           JSONObject col = (JSONObject) (jsonArray.get(i));
-          Schema schema =
-              new Schema(
-                  col.getString("name"),
-                  col.getString("type"),
-                  (col.has("comment") ? col.getString("comment") : null));
+          Schema schema = new Schema(
+              col.getString("name"),
+              col.getString("type"),
+              (col.has("comment") ? col.getString("comment") : null));
           schema.setPartitionKey(type.equals("partitionKeys"));
           ret.put(col.getString("name"), schema);
         }
@@ -547,7 +545,7 @@ public class ROdps {
   /**
    * @title: runSqlTask
    * @description: TODO
-   * @param sql The SQL string
+   * @param sql         The SQL string
    * @param interactive enable interactive (MCQA) or not
    * @return List<String>
    * @throws ROdpsException
@@ -570,12 +568,11 @@ public class ROdps {
           TASK_NAME = "rodps_mcqa_task";
           SQLExecutorBuilder builder = SQLExecutorBuilder.builder();
           SQLExecutor sqlExecutor = null;
-          sqlExecutor =
-              builder
-                  .odps(odps)
-                  .executeMode(ExecuteMode.INTERACTIVE)
-                  .fallbackPolicy(FallbackPolicy.alwaysFallbackPolicy())
-                  .build();
+          sqlExecutor = builder
+              .odps(odps)
+              .executeMode(ExecuteMode.INTERACTIVE)
+              .fallbackPolicy(FallbackPolicy.alwaysFallbackPolicy())
+              .build();
           if (settings.containsKey("odps.sql.submit.mode")) {
             settings.put("odps.sql.submit.mode", "script");
           }
@@ -590,7 +587,7 @@ public class ROdps {
           logView.setLogViewHost(LOGVIEW_HOST);
         }
         String logViewUrl = logView.generateLogView(inst, 7 * 24);
-        System.err.println(logViewUrl);
+        LOG.info("Logview: " + logViewUrl);
 
         inst.waitForSuccess();
         Map<String, String> results = inst.getTaskResults();
@@ -698,7 +695,7 @@ public class ROdps {
     TableFilter filter = new TableFilter();
     filter.setName(pattern);
 
-    for (Iterator<Table> it = odps.tables().iterator(projectName, filter); it.hasNext(); ) {
+    for (Iterator<Table> it = odps.tables().iterator(projectName, filter); it.hasNext();) {
       Table tb = it.next();
       owner.getData().add(tb.getOwner());
       tableName.getData().add(tb.getName());
@@ -739,7 +736,7 @@ public class ROdps {
   /**
    * @title: partitionMap2String
    * @description: TODO
-   * @param spec PartitionSpec
+   * @param spec     PartitionSpec
    * @param valueDim 值的分隔符
    * @param fieldDim 字段间的分隔符
    * @return String

@@ -18,10 +18,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.aliyun.odps.data.RecordWriter;
+import com.aliyun.odps.rodps.ROdps;
 import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
 
 /**
@@ -33,7 +34,7 @@ import com.aliyun.odps.tunnel.TableTunnel.UploadSession;
  * @version V1.0
  */
 public class UploadWorker implements Runnable {
-  static Log LOG = LogFactory.getLog(UploadWorker.class);
+  private static Logger LOG = LogManager.getLogger(UploadWorker.class);
 
   private int threadId;
   private String errorMessage;
