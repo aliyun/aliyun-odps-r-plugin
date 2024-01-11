@@ -13,6 +13,12 @@ if (rodps.table.exist("iris")) {
 names(iris) <- gsub("\\.", "_", names(iris))
 rodps.table.write(iris, "iris")
 
+# DDL generation
+sqlddl <- rodps.generate.DDL("testiris", iris, "Iris dataset")
+sqlddl2 <- rodps.generate.DDL("testiris", iris)
+print(sqlddl)
+print(sqlddl2)
+
 # Table reading
 tbl1 <- rodps.table.read("iris")
 head(tbl1)

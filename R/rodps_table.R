@@ -298,8 +298,17 @@ rodps.size.table <- rodps.table.size
         stop(paste("Invalid column name", colname))
 }
 
-#' @noRd
-.rodps.generate.DDL <- function(full.tablename, dataframe, tablecomment = NULL) {
+#' DDL Generation
+#'
+#' Generate SQL DDL from dataframe.
+#'
+#' @param full.tablename Table name, in format 'ProjectName.TableName',or
+#'   'TableName' (using current project).
+#' @param dataframe Source data frame.
+#' @param tablecomment DDL comment string.
+#' @author \email{yunyuan.zhangyy@alibaba-inc.com}
+#' @export
+rodps.generate.DDL <- function(full.tablename, dataframe, tablecomment = NULL) {
     p.t <- rodps.split.ftn(full.tablename)
     projectname <- p.t$projectname
     tablename <- p.t$tablename
@@ -310,24 +319,28 @@ rodps.size.table <- rodps.table.size
     }
 
     namelist <- names(dataframe)
+    if (length(namelist) == 0) {
+        stop("Zero columes in dataframe")
+    }
     for (n in namelist) .check.column.name(n)
 
     typelist <- sapply(dataframe, .get.object.type)
 
-    sql <- paste(" CREATE TABLE ", full.tablename, " (\n", sep = "")
+    sql <- paste("CREATE TABLE ", full.tablename, " (\n", sep = "")
     ncol <- length(namelist)
     ntype <- length(typelist)
 
     for (i in seq(1, ncol)) {
         if (i != ncol) {
-            sql <- paste(sql, " ", namelist[i], "\t", typelist[i], ",\n", sep = " ")
+            sql <- paste(sql, " ", namelist[i], "\t", typelist[i], ",\n", sep = "")
         } else {
-            sql <- paste(sql, " ", namelist[i], "\t", typelist[i], ")", sep = " ")
+            sql <- paste(sql, " ", namelist[i], "\t", typelist[i], ")", sep = "")
         }
     }
     if (!is.null(tablecomment)) {
-        sql <- paste(sql, "\n COMMENT '", tablecomment, "'")
+        sql <- paste(sql, "\nCOMMENT '", tablecomment, "'", sep = "")
     }
+    sql <- paste(sql, ";", sep = "")
     return(sql)
 }
 
@@ -380,7 +393,7 @@ rodps.table.write <- function(dataframe, full.tablename, partition = NULL, table
     }
     sql <- NULL
     if (!rodps.table.exist(full.tablename)) {
-        sql <- .rodps.generate.DDL(full.tablename, dataframe, tablecomment)
+        sql <- rodps.generate.DDL(full.tablename, dataframe, tablecomment)
     }
     if (!is.null(partition) && !rodps.table.exist(full.tablename, partition)) {
         sql <- paste("alter table", full.tablename, "add partition(", odpsOperator$formatPartition(partition,
